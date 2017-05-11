@@ -13,3 +13,19 @@ TEMPLATE = app
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
+
+SOURCES += \
+    src/main.cpp \
+    src/qmge_glwindow.cpp \
+    src/qmge_app.cpp \
+    src/qmge_renderer.cpp
+
+HEADERS += \
+    src/qmge_glwindow.h \
+    src/qmge_includes.h \
+    src/qmge_app.h \
+    src/qmge_renderer.h
+
+DISTFILES += \
+    README.md \
+    issues.txt

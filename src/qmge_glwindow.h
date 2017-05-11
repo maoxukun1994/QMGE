@@ -15,21 +15,15 @@ class QMGE_GLWindow : public QWindow
 
 public:
 
-    QMGE_GLWindow(QSurfaceFormat contextSettings = QSurfaceFormat());
+    QMGE_GLWindow(QSurfaceFormat contextSettings);
     ~QMGE_GLWindow();
+
+signals:
 
 public slots:
 
-    void render();
 
 protected:
-
-    //Functions associated with OpenGL
-    //create opengl context
-    void init();
-
-    void renderGL();
-    void resizeGL(int width, int height);
 
     //overrided virtual functions from QWindow
     bool event(QEvent *event) Q_DECL_OVERRIDE;
@@ -39,17 +33,9 @@ protected:
     void mouseReleaseEvent(QMouseEvent * e) Q_DECL_OVERRIDE;
     void keyPressEvent(QKeyEvent * e) Q_DECL_OVERRIDE;
     void keyReleaseEvent(QKeyEvent * e) Q_DECL_OVERRIDE;
+    void resizeEvent(QResizeEvent * e) Q_DECL_OVERRIDE;
 
 private:
-
-    //OpenGL Context
-    QSharedPointer<QOpenGLContext> m_context;
-
-    //indicate whether opengl context is initialized
-    bool m_isInitialized;
-
-    //indicate whether an update request is waiting
-    bool m_updatePending;
 
     //is current window in fullscreen
     bool m_isFullScreen;

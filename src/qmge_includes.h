@@ -3,6 +3,7 @@
 
 #include <QtDebug>
 #include <QScopedPointer>
+#include <QCoreApplication>
 
 
 #include <QWindow>

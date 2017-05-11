@@ -6,21 +6,50 @@
 namespace QMGE_Core
 {
 
+class QMGE_GLWindow;
 
-class QMGE_Renderer : public QObject
+class QMGE_Renderer : public QObject,protected QOpenGLExtraFunctions
 {
     Q_OBJECT
 
-signals:
-
 public:
 
-    QMGE_Renderer(QObject * parent = nullptr,QSurfaceFormat contextSettings);
+    QMGE_Renderer(QSurfaceFormat contextSettings,QMGE_GLWindow * parent = nullptr);
 
     ~QMGE_Renderer();
 
+protected:
+
+    void init();
+
+    void renderOnce();
+    void renderLater();
+
+    bool event(QEvent *event) Q_DECL_OVERRIDE;
+
+signals:
+
 public slots:
 
+    //opened for called by parent(QMGE_GLWindow)
+    void execRender();
+
+private:
+
+    //context setting for creating the OpenGL context
+    QSurfaceFormat m_contextSettings;
+
+    //OpenGL context pointer
+    QSharedPointer<QOpenGLContext> m_context;
+
+    //indicate whether opengl context is initialized
+    volatile bool m_isInitialized;
+
+    //indicate whether an update request is waiting
+    volatile bool m_updatePending;
+
+    //the window this renderer render against
+    QMGE_GLWindow * m_renderWindow;
 
 };
 //class QMGE_Renderer

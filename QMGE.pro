@@ -28,4 +28,4 @@ HEADERS += \
 
 DISTFILES += \
     README.md \
-    issues.txt
+    MEMO.md

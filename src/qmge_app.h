@@ -3,24 +3,32 @@
 
 #include "qmge_includes.h"
 #include "qmge_glwindow.h"
+#include "qmge_renderer.h"
 
 namespace QMGE_Core
 {
 
-class QMGE_App
+class QMGE_App : public QObject
 {
+    Q_OBJECT
 
 public:    
 
-    QMGE_App(bool isMultiThread = false);
+    QMGE_App();
+    ~QMGE_App();
 
+    //create window,along with renderer.
     void createWindow(int width,int height,bool isFullScreen = true);
+
+    void run();
 
 private:
 
-    QScopedPointer<QMGE_GLWindow> m_window;
+    QThread m_renderThread;
 
-    bool m_isMultiThread;
+    QScopedPointer<QMGE_GLWindow> m_window;
+    QScopedPointer<QMGE_Renderer> m_renderer;
+
 };
 //class QMGE_App
 

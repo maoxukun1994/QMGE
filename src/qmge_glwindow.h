@@ -7,7 +7,8 @@ namespace QMGE_Core
 {
 
 
-//A QMGE_GLWindow is created with an OpenGL Context.
+//QMGE_GLWindow used as a rendering surface
+//in charge of event handling
 
 class QMGE_GLWindow : public QWindow
 {
@@ -20,8 +21,10 @@ public:
 
 signals:
 
-public slots:
+    void startRenderThread();
+    void stopRenderThread();
 
+public slots:
 
 protected:
 
@@ -34,11 +37,6 @@ protected:
     void keyPressEvent(QKeyEvent * e) Q_DECL_OVERRIDE;
     void keyReleaseEvent(QKeyEvent * e) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent * e) Q_DECL_OVERRIDE;
-
-private:
-
-    //is current window in fullscreen
-    bool m_isFullScreen;
 };
 //class QMGE_GLWindow
 

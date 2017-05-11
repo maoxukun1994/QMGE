@@ -6,8 +6,6 @@ namespace QMGE_Core
 
 QMGE_GLWindow::QMGE_GLWindow(QSurfaceFormat contextSettings):QWindow()
 {
-    m_isFullScreen = false;
-
     setSurfaceType(QSurface::OpenGLSurface);
     setFormat(contextSettings);
 }
@@ -17,15 +15,22 @@ QMGE_GLWindow::~QMGE_GLWindow()
 
 }
 
-
-bool QMGE_GLWindow::event(QEvent *event)
+bool QMGE_GLWindow::event(QEvent * event)
 {
-
+    switch(event->type())
+    {
+    default:
+        return QWindow::event(event);
+    }
 }
 
-void QMGE_GLWindow::exposeEvent(QExposeEvent *event)
+void QMGE_GLWindow::exposeEvent(QExposeEvent * event)
 {
-
+    Q_UNUSED(event);
+    if(isExposed())
+    {
+        emit startRenderThread();
+    }
 }
 
 void QMGE_GLWindow::mouseMoveEvent(QMouseEvent * e)

@@ -25,9 +25,11 @@ protected:
     void renderOnce();
     void renderLater();
 
-    bool event(QEvent *event) Q_DECL_OVERRIDE;
+    bool event(QEvent * event) Q_DECL_OVERRIDE;
 
 signals:
+
+    void stopExec();
 
 public slots:
 
@@ -50,6 +52,9 @@ private:
 
     //the window this renderer render against
     QMGE_GLWindow * m_renderWindow;
+
+    //count fps
+    int m_frames;
 
 };
 //class QMGE_Renderer

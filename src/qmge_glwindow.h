@@ -1,7 +1,7 @@
 #ifndef QMGE_GLWINDOW_H
 #define QMGE_GLWINDOW_H
 
-#include "qmge_includes.h"
+#include "qmge_global.h"
 
 namespace QMGE_Core
 {
@@ -25,6 +25,8 @@ signals:
     void stopRenderThread();
 
 public slots:
+
+    void safeClose();
 
 protected:
 

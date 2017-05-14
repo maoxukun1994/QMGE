@@ -5,13 +5,11 @@ namespace QMGE_Core
 
 QMGE_App::QMGE_App() : QObject()
 {
-
 }
 
 
 QMGE_App::~QMGE_App()
 {
-    m_renderThread.wait();
 }
 
 void QMGE_App::createWindow(int width,int height,bool isFullScreen)
@@ -19,7 +17,7 @@ void QMGE_App::createWindow(int width,int height,bool isFullScreen)
     QSurfaceFormat config;
     config.setDepthBufferSize(24);
     config.setStencilBufferSize(8);
-    config.setSwapBehavior(QSurfaceFormat::TripleBuffer);
+    config.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
     config.setSwapInterval(0);
     config.setSamples(4);
     if(QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL)
@@ -47,15 +45,20 @@ void QMGE_App::createWindow(int width,int height,bool isFullScreen)
 
     //create renderer
     m_renderer.reset(new QMGE_Renderer(config,m_window.data()));
+    //create thread
+    m_renderThread.reset(new QThread());
 
-    //when window exposed,first a updaterequest event will be sent to m_renderer by execRender
-    connect(m_window.data(),SIGNAL(startRenderThread()),m_renderer.data(),SLOT(execRender()));
-    //then,thread containing m_renderer will start(or restart) event loop to handle events.
-    connect(m_window.data(),SIGNAL(startRenderThread()),&m_renderThread,SLOT(start()));
-    //m_renderer will stop the event loop in its thread when render window not available
-    connect(m_renderer.data(),SIGNAL(stopExec()),&m_renderThread,SLOT(quit()));
     //move m_renderer to thread
-    m_renderer->moveToThread(&m_renderThread);
+    m_renderer->moveToThread(m_renderThread.data());
+
+    //when window exposed,a updaterequest event will be sent to m_renderer by execRender
+    connect(m_window.data(),SIGNAL(startRenderThread()),m_renderer.data(),SLOT(execRender()));
+    //when window thread emit stop signal,first quit the event loop on render thread
+    connect(m_window.data(),SIGNAL(stopRenderThread()),m_renderThread.data(),SLOT(quit()));
+    //when render thread quit,do cleaning up on m_renderer
+    connect(m_renderThread.data(),SIGNAL(finished()),m_renderer.data(),SLOT(cleanUp()));
+    //when renderer done cleanup,it will emit readyToStop signal,and then we can close the window
+    connect(m_renderer.data(),SIGNAL(readyToStop()),m_window.data(),SLOT(safeClose()));
 
     if(isFullScreen)
     {
@@ -76,6 +79,8 @@ void QMGE_App::run()
     {
         createWindow(0,0,true);
     }
+
+    m_renderThread->start();
 }
 
 }

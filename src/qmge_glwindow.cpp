@@ -12,13 +12,25 @@ QMGE_GLWindow::QMGE_GLWindow(QSurfaceFormat contextSettings):QWindow()
 
 QMGE_GLWindow::~QMGE_GLWindow()
 {
+}
 
+//slot ,do actual close
+void QMGE_GLWindow::safeClose()
+{
+    this->destroy();
 }
 
 bool QMGE_GLWindow::event(QEvent * event)
 {
     switch(event->type())
     {
+    case QEvent::Close:
+        //catch close signal and inform other thread that the window
+        //is going to close,and wait for them to be ready.
+        //close is done in safeClose()
+        emit stopRenderThread();
+        event->ignore();
+        return true;
     default:
         return QWindow::event(event);
     }

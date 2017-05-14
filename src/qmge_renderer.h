@@ -1,12 +1,16 @@
 #ifndef QMGE_RENDERER_H
 #define QMGE_RENDERER_H
 
-#include "qmge_includes.h"
+#include "qmge_global.h"
+#include "qmge_glwindow.h"
+#include "qmge_gluniformmanager.h"
+
+//tempory
+#include "qmge_glbatch.h"
+#include "qmge_glshaderprogram.h"
 
 namespace QMGE_Core
 {
-
-class QMGE_GLWindow;
 
 class QMGE_Renderer : public QObject,protected QOpenGLExtraFunctions
 {
@@ -17,6 +21,9 @@ public:
     QMGE_Renderer(QSurfaceFormat contextSettings,QMGE_GLWindow * parent = nullptr);
 
     ~QMGE_Renderer();
+
+    //for other resources initialization
+    void postInit();
 
 protected:
 
@@ -29,12 +36,15 @@ protected:
 
 signals:
 
-    void stopExec();
+    void readyToStop();
 
 public slots:
 
     //opened for called by parent(QMGE_GLWindow)
     void execRender();
+
+    //do cleaning up jobs
+    void cleanUp();
 
 private:
 
@@ -53,8 +63,13 @@ private:
     //the window this renderer render against
     QMGE_GLWindow * m_renderWindow;
 
+    //temporary
     //count fps
     int m_frames;
+    QScopedPointer<QMGE_GLBatch> batch;
+    QScopedPointer<QMGE_GLShaderProgram> program;
+    QScopedPointer<QOpenGLTexture> texture;
+
 
 };
 //class QMGE_Renderer

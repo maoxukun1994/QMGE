@@ -1,7 +1,7 @@
 #ifndef QMGE_APP_H
 #define QMGE_APP_H
 
-#include "qmge_includes.h"
+#include "qmge_global.h"
 #include "qmge_glwindow.h"
 #include "qmge_renderer.h"
 
@@ -24,8 +24,7 @@ public:
 
 private:
 
-    QThread m_renderThread;
-
+    QScopedPointer<QThread> m_renderThread;
     QScopedPointer<QMGE_GLWindow> m_window;
     QScopedPointer<QMGE_Renderer> m_renderer;
 

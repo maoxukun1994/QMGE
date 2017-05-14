@@ -18,14 +18,27 @@ SOURCES += \
     src/main.cpp \
     src/qmge_glwindow.cpp \
     src/qmge_app.cpp \
-    src/qmge_renderer.cpp
+    src/qmge_renderer.cpp \
+    src/qmge_glbatch.cpp \
+    src/qmge_glshaderprogram.cpp \
+    src/qmge_gluniformmanager.cpp \
+    src/qmge_glcamera.cpp \
+    src/qmge_sceneobject.cpp
 
 HEADERS += \
+    src/qmge_global.h \
     src/qmge_glwindow.h \
-    src/qmge_includes.h \
     src/qmge_app.h \
-    src/qmge_renderer.h
+    src/qmge_renderer.h \
+    src/qmge_glbatch.h \
+    src/qmge_glshaderprogram.h \
+    src/qmge_gluniformmanager.h \
+    src/qmge_glcamera.h \
+    src/qmge_sceneobject.h
 
 DISTFILES += \
     README.md \
     MEMO.md
+
+RESOURCES += \
+    resource.qrc

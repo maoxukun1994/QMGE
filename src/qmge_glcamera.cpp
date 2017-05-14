@@ -41,6 +41,8 @@ void QMGE_GLCamera::setPerspective(float fov,float aspect,float near,float far)
     m_aspect = aspect;
     m_near = near;
     m_far = far;
+
+    updateP();
 }
 
 void QMGE_GLCamera::setOrtho(float left, float right, float bottom, float top, float nearPlane, float farPlane)
@@ -52,6 +54,8 @@ void QMGE_GLCamera::setOrtho(float left, float right, float bottom, float top, f
     m_top = top;
     m_near = nearPlane;
     m_far = farPlane;
+
+    updateP();
 }
 
 //get

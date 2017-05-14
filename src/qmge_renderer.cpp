@@ -9,6 +9,12 @@ QMGE_Renderer::QMGE_Renderer(QSurfaceFormat contextSettings,QMGE_GLWindow * pare
     m_updatePending = false;
 
     m_contextSettings = contextSettings;
+
+    if(parent == nullptr)
+    {
+        qFatal("Can not create a render without a valid QMGE_GLWindow.");
+    }
+
     m_renderWindow = parent;
 
     m_frames = 0;
@@ -81,7 +87,42 @@ void QMGE_Renderer::postInit()
     batch->enableBatchVertexAttrib(VA_TUV_0);
     batch->setVertexData(verts,36,VA_POSITION);
     batch->setVertexData(tuvs,36,VA_TUV_0);
+    mMatrix.translate(QVector3D(0,5,0));
+    QMGE_GLUniformManager::getInstance()->registerHostUniform("mMatrix",QMGE_UniformType::MAT4,(void *)mMatrix.constData());
 
+    texture.reset(new QOpenGLTexture(QImage(":/textures/test.png")));
+    Q_ASSERT(!texture.isNull());
+    texture->setMinificationFilter(QOpenGLTexture::Linear);
+    texture->setMagnificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    texId = 0;
+    QMGE_GLUniformManager::getInstance()->registerHostUniform("tex",QMGE_UniformType::INT,(void *)&texId);
+
+    camera.reset(new QMGE_GLCamera());
+    camera->setPosition(0,0,0);
+    camera->setPerspective(60.0f,1.788f,0.1f,100.0f);
+    QMGE_GLUniformManager::getInstance()->registerHostUniform("vMatrix",QMGE_UniformType::MAT4,(void *)camera->m_vMatrix.constData());
+    QMGE_GLUniformManager::getInstance()->registerHostUniform("pMatrix",QMGE_UniformType::MAT4,(void *)camera->m_pMatrix.constData());
+
+    program.reset(new QMGE_GLShaderProgram());
+    program->addShaderFromSourceFile(QOpenGLShader::Vertex,QString(":/shaders/basic.vert"));
+    program->addShaderFromSourceFile(QOpenGLShader::Fragment,QString(":/shaders/basic.frag"));
+    program->setShaderConfigFile(QString(":/shaders/basic.config"));
+    program->linkProgram();
+}
+
+
+//for user implemented render
+void QMGE_Renderer::render()
+{
+    glViewport(0,0,640,480);
+    glClearColor(0.2f,0.5f,0.8f,1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    texture->bind();
+    program->bind();
+    program->update_frame();
+    camera->updateV();
+    batch->draw();
+    mMatrix.rotate(0.2,QVector3D(0,0,1));
 }
 
 void QMGE_Renderer::init()
@@ -138,9 +179,7 @@ void QMGE_Renderer::renderOnce()
         m_context->makeCurrent(m_renderWindow);
 
         //do actual rendering
-        glClearColor(0.2f,0.5f,0.8f,1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
+        render();
 
         //swap buffer
         m_context->swapBuffers(m_renderWindow);

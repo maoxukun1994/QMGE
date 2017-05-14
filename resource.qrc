@@ -1,1 +1,8 @@
-<RCC/>
+<RCC>
+    <qresource prefix="/">
+        <file>shaders/basic.config</file>
+        <file>shaders/basic.frag</file>
+        <file>shaders/basic.vert</file>
+        <file>textures/test.png</file>
+    </qresource>
+</RCC>

@@ -97,7 +97,7 @@ void QMGE_GLBatch::setVertexData(GLfloat * data, GLint vertexCount, QMGE_VAttrib
     }
 
     //set status
-    setAttrExpectStatusBit(type);
+    setAttrStatusBit(type);
 
     //update vao
     updateVAO();

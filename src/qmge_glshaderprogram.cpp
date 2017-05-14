@@ -76,7 +76,7 @@ void QMGE_GLShaderProgram::setupUniforms()
     //Retrieve the source code from filePath
     QFile ConfigFile(m_configFileName);
 
-    if(ConfigFile.open(QFile::ReadOnly))
+    if(!ConfigFile.open(QFile::ReadOnly))
     {
         qWarning()<<"Can not open shader config file.Will not configure uniforms of this shader.";
     }
@@ -91,9 +91,11 @@ void QMGE_GLShaderProgram::setupUniforms()
 
         while(stream.readLineInto(&line))
         {
+            //skip comment lines
+            if(line.startsWith('#')) continue;
             name = line.section(QChar(','),0,0,flag).trimmed();
             type = line.section(QChar(','),1,1,flag).trimmed();
-            updateMethod = line.section(QChar(','),1,1,flag).trimmed();
+            updateMethod = line.section(QChar(','),2,2,flag).trimmed();
             if(name.isEmpty() || type.isEmpty() || updateMethod.isEmpty())
             {
                 continue;

@@ -8,6 +8,7 @@
 //tempory
 #include "qmge_glbatch.h"
 #include "qmge_glshaderprogram.h"
+#include "qmge_glcamera.h"
 
 namespace QMGE_Core
 {
@@ -18,12 +19,14 @@ class QMGE_Renderer : public QObject,protected QOpenGLExtraFunctions
 
 public:
 
-    QMGE_Renderer(QSurfaceFormat contextSettings,QMGE_GLWindow * parent = nullptr);
+    QMGE_Renderer(QSurfaceFormat contextSettings,QMGE_GLWindow * parent);
 
     ~QMGE_Renderer();
 
     //for other resources initialization
-    void postInit();
+    virtual void postInit();
+    //for user implemented render
+    virtual void render();
 
 protected:
 
@@ -66,9 +69,12 @@ private:
     //temporary
     //count fps
     int m_frames;
+    QMatrix4x4 mMatrix;
     QScopedPointer<QMGE_GLBatch> batch;
+    GLuint texId;
     QScopedPointer<QMGE_GLShaderProgram> program;
     QScopedPointer<QOpenGLTexture> texture;
+    QScopedPointer<QMGE_GLCamera> camera;
 
 
 };

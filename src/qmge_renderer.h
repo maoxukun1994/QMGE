@@ -8,6 +8,7 @@
 //tempory
 #include "qmge_glbatch.h"
 #include "qmge_glshaderprogram.h"
+#include "qmge_fpscameracontroller.h"
 #include "qmge_glcamera.h"
 
 namespace QMGE_Core
@@ -39,12 +40,20 @@ protected:
 
 signals:
 
+    void initialized();
     void readyToStop();
 
 public slots:
 
     //opened for called by parent(QMGE_GLWindow)
     void execRender();
+
+    //used for changing glviewport when renderwindow changed size.
+    void resizeGL(int w,int h);
+
+    //key and mouse
+    void windowKeyChanged(int key,bool pressed);
+    void windowMouseMoved(int deltax,int deltay);
 
     //do cleaning up jobs
     void cleanUp();
@@ -75,6 +84,7 @@ private:
     QScopedPointer<QMGE_GLShaderProgram> program;
     QScopedPointer<QOpenGLTexture> texture;
     QScopedPointer<QMGE_GLCamera> camera;
+    QScopedPointer<QMGE_FPSCameraController> camcontrol;
 
 
 };

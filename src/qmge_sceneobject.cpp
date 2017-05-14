@@ -13,12 +13,12 @@ QMGE_Transform QMGE_SceneObject::getTransform()
 }
 
 //set
-void QMGE_SceneObject::setTransform(QMGE_Transform &transform)
+void QMGE_SceneObject::setTransform(QMGE_Transform transform)
 {
     m_transform = transform;
 }
 
-void QMGE_SceneObject::setPosition(QVector3D &position)
+void QMGE_SceneObject::setPosition(QVector3D position)
 {
     m_transform.position = position;
 }
@@ -28,7 +28,7 @@ void QMGE_SceneObject::setPosition(float x,float y,float z)
     m_transform.position = QVector3D(x,y,z);
 }
 
-void QMGE_SceneObject::setRotation(QQuaternion &rotation)
+void QMGE_SceneObject::setRotation(QQuaternion rotation)
 {
     m_transform.rotation = rotation;
 }

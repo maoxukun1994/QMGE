@@ -18,7 +18,7 @@ void QMGE_App::createWindow(int width,int height,bool isFullScreen)
     config.setDepthBufferSize(24);
     config.setStencilBufferSize(8);
     config.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-    config.setSwapInterval(0);
+    config.setSwapInterval(1);
     config.setSamples(4);
     if(QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL)
     {
@@ -59,6 +59,14 @@ void QMGE_App::createWindow(int width,int height,bool isFullScreen)
     connect(m_renderThread.data(),SIGNAL(finished()),m_renderer.data(),SLOT(cleanUp()));
     //when renderer done cleanup,it will emit readyToStop signal,and then we can close the window
     connect(m_renderer.data(),SIGNAL(readyToStop()),m_window.data(),SLOT(safeClose()));
+
+    //connect other renderer and render window signals/slots
+    //resize event;
+    connect(m_renderer.data(),SIGNAL(initialized()),m_window.data(),SLOT(postRendererInitialized()));
+    connect(m_window.data(),SIGNAL(resized(int,int)),m_renderer.data(),SLOT(resizeGL(int,int)));
+    //key and mouse
+    connect(m_window.data(),SIGNAL(keyChanged(int,bool)),m_renderer.data(),SLOT(windowKeyChanged(int,bool)));
+    connect(m_window.data(),SIGNAL(mouseMoved(int,int)),m_renderer.data(),SLOT(windowMouseMoved(int,int)));
 
     if(isFullScreen)
     {

@@ -23,7 +23,8 @@ SOURCES += \
     src/qmge_glshaderprogram.cpp \
     src/qmge_gluniformmanager.cpp \
     src/qmge_glcamera.cpp \
-    src/qmge_sceneobject.cpp
+    src/qmge_sceneobject.cpp \
+    src/qmge_fpscameracontroller.cpp
 
 HEADERS += \
     src/qmge_global.h \
@@ -34,7 +35,8 @@ HEADERS += \
     src/qmge_glshaderprogram.h \
     src/qmge_gluniformmanager.h \
     src/qmge_glcamera.h \
-    src/qmge_sceneobject.h
+    src/qmge_sceneobject.h \
+    src/qmge_fpscameracontroller.h
 
 DISTFILES += \
     README.md \

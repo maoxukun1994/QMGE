@@ -29,10 +29,10 @@ public:
     QMGE_Transform getTransform();
 
     //set
-    void setTransform(QMGE_Transform &transform);
-    void setPosition(QVector3D &position);
+    void setTransform(QMGE_Transform transform);
+    void setPosition(QVector3D position);
     void setPosition(float x,float y,float z);
-    void setRotation(QQuaternion &rotation);
+    void setRotation(QQuaternion rotation);
     void setScale(QVector3D &scale);
     void setScale(float x,float y,float z);
 

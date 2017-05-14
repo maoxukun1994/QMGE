@@ -24,8 +24,14 @@ signals:
     void startRenderThread();
     void stopRenderThread();
 
+    void resized(int w,int h);
+
+    void keyChanged(int key,bool pressed);
+    void mouseMoved(int deltax,int deltay);
+
 public slots:
 
+    void postRendererInitialized();
     void safeClose();
 
 protected:
@@ -39,6 +45,11 @@ protected:
     void keyPressEvent(QKeyEvent * e) Q_DECL_OVERRIDE;
     void keyReleaseEvent(QKeyEvent * e) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent * e) Q_DECL_OVERRIDE;
+
+private:
+
+    QPoint m_lastMousePos;
+    bool m_mousePressed;
 };
 //class QMGE_GLWindow
 

@@ -29,6 +29,18 @@ public:
     QMatrix4x4 getVMatrix();
     QMatrix4x4 getPMatrix();
 
+    float getPitch();
+    float getYaw();
+    float getRoll();
+
+    QVector3D getForward();
+    QVector3D getUp();
+
+    //set
+    void setPitch(float degree);
+    void setYaw(float degree);
+    void setRoll(float degree);
+
     //camera rotation
     void pitch(float degree);
     void yaw(float degree);
@@ -45,15 +57,16 @@ public:
 
 protected:
 
+    QMGE_CameraPerspective m_type;
+
     const QVector3D baseForward;
     const QVector3D baseUp;
     const QVector3D baseLeft;
 
-    QMGE_CameraPerspective m_type;
-
     QVector3D m_forward;
     QVector3D m_up;
 
+    //control
     float m_pitchDegree;
     float m_yawDegree;
     float m_rollDegree;

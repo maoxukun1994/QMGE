@@ -14,8 +14,10 @@ QMGE_Renderer::QMGE_Renderer(QSurfaceFormat contextSettings,QMGE_GLWindow * pare
     {
         qFatal("Can not create a render without a valid QMGE_GLWindow.");
     }
-
-    m_renderWindow = parent;
+    else
+    {
+        m_renderWindow = parent;
+    }
 
     m_frames = 0;
 }
@@ -87,7 +89,7 @@ void QMGE_Renderer::postInit()
     batch->enableBatchVertexAttrib(VA_TUV_0);
     batch->setVertexData(verts,36,VA_POSITION);
     batch->setVertexData(tuvs,36,VA_TUV_0);
-    mMatrix.translate(QVector3D(0,5,0));
+    mMatrix.translate(QVector3D(0,2,0));
     QMGE_GLUniformManager::getInstance()->registerHostUniform("mMatrix",QMGE_UniformType::MAT4,(void *)mMatrix.constData());
 
     texture.reset(new QOpenGLTexture(QImage(":/textures/test.png")));
@@ -98,31 +100,36 @@ void QMGE_Renderer::postInit()
     QMGE_GLUniformManager::getInstance()->registerHostUniform("tex",QMGE_UniformType::INT,(void *)&texId);
 
     camera.reset(new QMGE_GLCamera());
-    camera->setPosition(0,0,0);
+    camera->setPosition(0,0,2);
+    camera->setPitch(-45.0f);
     camera->setPerspective(60.0f,1.788f,0.1f,100.0f);
     QMGE_GLUniformManager::getInstance()->registerHostUniform("vMatrix",QMGE_UniformType::MAT4,(void *)camera->m_vMatrix.constData());
     QMGE_GLUniformManager::getInstance()->registerHostUniform("pMatrix",QMGE_UniformType::MAT4,(void *)camera->m_pMatrix.constData());
+
+    camcontrol.reset(new QMGE_FPSCameraController(camera.data()));
 
     program.reset(new QMGE_GLShaderProgram());
     program->addShaderFromSourceFile(QOpenGLShader::Vertex,QString(":/shaders/basic.vert"));
     program->addShaderFromSourceFile(QOpenGLShader::Fragment,QString(":/shaders/basic.frag"));
     program->setShaderConfigFile(QString(":/shaders/basic.config"));
     program->linkProgram();
+
+    glEnable(GL_DEPTH_TEST);
 }
 
 
 //for user implemented render
 void QMGE_Renderer::render()
 {
-    glViewport(0,0,640,480);
     glClearColor(0.2f,0.5f,0.8f,1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     texture->bind();
     program->bind();
     program->update_frame();
+    camcontrol->updateCam(0.016f);
     camera->updateV();
     batch->draw();
-    mMatrix.rotate(0.2,QVector3D(0,0,1));
+    mMatrix.rotate(1,QVector3D(0,0,1));
 }
 
 void QMGE_Renderer::init()
@@ -168,6 +175,9 @@ void QMGE_Renderer::init()
     //prepare the render scene .etc
     //...
     postInit();
+
+    //inform the window that renderer is ready
+    emit initialized();
 }
 
 void QMGE_Renderer::renderOnce()
@@ -222,6 +232,27 @@ void QMGE_Renderer::execRender()
         init();
     }
     renderLater();
+}
+
+//used for changing glviewport when renderwindow changed size.
+void QMGE_Renderer::resizeGL(int w, int h)
+{
+    if(m_isInitialized)
+    {
+        glViewport(0,0,w,h);
+    }
+}
+
+void QMGE_Renderer::windowKeyChanged(int key,bool pressed)
+{
+    //temp
+    camcontrol->move(key,pressed);
+}
+
+void QMGE_Renderer::windowMouseMoved(int deltax,int deltay)
+{
+    //temp
+    camcontrol->rotate(-(float)deltax * 0.2,-(float)deltay * 0.2,0);
 }
 
 void QMGE_Renderer::cleanUp()

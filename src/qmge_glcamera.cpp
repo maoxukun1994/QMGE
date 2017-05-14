@@ -19,7 +19,7 @@ QMGE_GLCamera::QMGE_GLCamera(QMGE_CameraPerspective type, QMGE_SceneObject * par
     m_near = 0.1f;
     m_far = 100.0f;
     //perspective
-    m_fov = 45.0f;
+    m_fov = 90.0f;
     m_aspect = 1.0f;
     //ortho
     m_left = 0.0f;
@@ -67,6 +67,49 @@ QMatrix4x4 QMGE_GLCamera::getVMatrix()
 QMatrix4x4 QMGE_GLCamera::getPMatrix()
 {
     return m_pMatrix;
+}
+
+float QMGE_GLCamera::getPitch()
+{
+    return m_pitchDegree;
+}
+
+float QMGE_GLCamera::getYaw()
+{
+    return m_yawDegree;
+}
+
+float QMGE_GLCamera::getRoll()
+{
+    return m_rollDegree;
+}
+
+QVector3D QMGE_GLCamera::getForward()
+{
+    return m_forward;
+}
+
+QVector3D QMGE_GLCamera::getUp()
+{
+    return m_up;
+}
+
+void QMGE_GLCamera::setPitch(float degree)
+{
+    m_pitchDegree = degree;
+    updateV();
+}
+
+void QMGE_GLCamera::setYaw(float degree)
+{
+    m_yawDegree = degree;
+    updateV();
+}
+
+void QMGE_GLCamera::setRoll(float degree)
+{
+    m_rollDegree = degree;
+    updateV();
 }
 
 void QMGE_GLCamera::pitch(float degree)

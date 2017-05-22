@@ -130,6 +130,11 @@ void QMGE_Renderer::postInit()
     glEnable(GL_CULL_FACE);
     glClearColor(0.2f,0.5f,0.8f,1.0f);
     glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+    
+#ifdef OPENGL_DESKTOP
+    auto f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_5_Core>();
+    f->glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+#endif
 
 }
 

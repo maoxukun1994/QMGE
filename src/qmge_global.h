@@ -32,8 +32,15 @@
 #include <QOpenGLShader>
 #include <QOpenGLContext>
 #include <QOpenGLTexture>
+#include <QOpenGLFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLVertexArrayObject>
 
 #endif // QMGE_GLOBAL_H
+
+#define OPENGL_DESKTOP
+
+#ifdef OPENGL_DESKTOP
+#include <QOpenGLFunctions_4_5_Core>
+#endif

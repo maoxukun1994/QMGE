@@ -1,3 +1,6 @@
 需要设计一种方案处理输入问题，现在的方案不够灵活。
+第一人称相机控制器视角bug。鼠标移动的加速度。
 
-第一人称相机控制器视角bug。查看加速度。
+
+使用QSharedPointer和模板泛型函数修改了uniform更新系统。
+数据的创建和删除都通过uniformManager.注册uniform的类不再拥有uniform值的所有权，内存全交由uniform manager管理。

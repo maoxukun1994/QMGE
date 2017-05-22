@@ -3,6 +3,7 @@
 
 #include "qmge_global.h"
 #include "qmge_sceneobject.h"
+#include "qmge_uniformprovider.h"
 
 namespace QMGE_Core
 {
@@ -13,7 +14,7 @@ enum QMGE_CameraPerspective
     ORTHO
 };
 
-class QMGE_GLCamera : public QMGE_SceneObject
+class QMGE_GLCamera : public QMGE_SceneObject,public QMGE_UniformProvider
 {
 
 public:
@@ -26,8 +27,8 @@ public:
     void setOrtho(float left, float right, float bottom, float top, float nearPlane, float farPlane);
 
     //get
-    QMatrix4x4 getVMatrix();
-    QMatrix4x4 getPMatrix();
+    QMatrix4x4 * getVMatrix();
+    QMatrix4x4 * getPMatrix();
 
     float getPitch();
     float getYaw();
@@ -50,10 +51,15 @@ public:
     void updateV();
     void updateP();
 
+protected:
+
+    //override register uniforms
+    void registerUniforms() Q_DECL_OVERRIDE;
+
 public:
 
-    QMatrix4x4 m_vMatrix;
-    QMatrix4x4 m_pMatrix;
+    QMatrix4x4 * m_vMatrix;
+    QMatrix4x4 * m_pMatrix;
 
 protected:
 
@@ -70,7 +76,6 @@ protected:
     float m_pitchDegree;
     float m_yawDegree;
     float m_rollDegree;
-
     //for distance clipping
     float m_near;
     float m_far;

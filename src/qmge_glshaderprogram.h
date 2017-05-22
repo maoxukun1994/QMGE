@@ -14,10 +14,12 @@ class QMGE_GLShaderProgram : public QOpenGLShaderProgram
 public:
 
     QMGE_GLShaderProgram();
+
     ~QMGE_GLShaderProgram();
 
     void linkProgram();
     void setShaderConfigFile(QString filename);
+
     void update_frame();
     void update_fixed();
     void update_once();

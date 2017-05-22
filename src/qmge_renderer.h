@@ -10,6 +10,8 @@
 #include "qmge_glshaderprogram.h"
 #include "qmge_fpscameracontroller.h"
 #include "qmge_glcamera.h"
+//#include "massiveground/massiveground.h"
+#include "massiveground/chunkmanager.h"
 
 namespace QMGE_Core
 {
@@ -78,15 +80,9 @@ private:
     //temporary
     //count fps
     int m_frames;
-    QMatrix4x4 mMatrix;
-    QScopedPointer<QMGE_GLBatch> batch;
-    GLuint texId;
-    QScopedPointer<QMGE_GLShaderProgram> program;
-    QScopedPointer<QOpenGLTexture> texture;
     QScopedPointer<QMGE_GLCamera> camera;
     QScopedPointer<QMGE_FPSCameraController> camcontrol;
-
-
+    ChunkManager * m_chunkManager;
 };
 //class QMGE_Renderer
 

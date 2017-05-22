@@ -146,6 +146,7 @@ void QMGE_GLShaderProgram::setupUniforms()
                 //bind host uniforms
                 if(!QMGE_GLUniformManager::getInstance()->bindShaderUniform(newUniform))
                 {
+                    qWarning()<<"Shader Uniform bind failed.";
                     continue;
                 }
 
@@ -175,30 +176,30 @@ void QMGE_GLShaderProgram::setupUniforms()
 
 void QMGE_GLShaderProgram::updateUniform(QMGE_ShaderUniform &target)
 {
-    if(target.data == nullptr) return;
+    if(target.dataPtr == nullptr) return;
 
     switch(target.type)
     {
     case QMGE_UniformType::INT:
-        setUniformValueArray(target.location,((GLint *)target.data),1);
+        setUniformValueArray(target.location,((GLint *)target.dataPtr),1);
         break;
     case QMGE_UniformType::FLOAT:
-        setUniformValueArray(target.location,((GLfloat *)target.data),1,1);
+        setUniformValueArray(target.location,((GLfloat *)target.dataPtr),1,1);
         break;
     case QMGE_UniformType::VEC2:
-        setUniformValueArray(target.location,((QVector2D *)target.data),1);
+        setUniformValueArray(target.location,((QVector2D *)target.dataPtr),1);
         break;
     case QMGE_UniformType::VEC3:
-        setUniformValueArray(target.location,((QVector3D *)target.data),1);
+        setUniformValueArray(target.location,((QVector3D *)target.dataPtr),1);
         break;
     case QMGE_UniformType::VEC4:
-        setUniformValueArray(target.location,((QVector4D *)target.data),1);
+        setUniformValueArray(target.location,((QVector4D *)target.dataPtr),1);
         break;
     case QMGE_UniformType::MAT3:
-        setUniformValueArray(target.location,((QMatrix3x3 *)target.data),1);
+        setUniformValueArray(target.location,((QMatrix3x3 *)target.dataPtr),1);
         break;
     case QMGE_UniformType::MAT4:
-        setUniformValueArray(target.location,((QMatrix4x4 *)target.data),1);
+        setUniformValueArray(target.location,((QMatrix4x4 *)target.dataPtr),1);
         break;
     default:
         break;

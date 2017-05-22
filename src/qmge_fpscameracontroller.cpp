@@ -15,10 +15,10 @@ QMGE_FPSCameraController::QMGE_FPSCameraController(QMGE_GLCamera * camera)
     }
     m_currentAngleSpeed = 0.0f;
     m_destRot = QVector3D(camera->getPitch(),camera->getYaw(),camera->getRoll());
-    m_maxLinearspeed = 15.0f;
+    m_maxLinearspeed = 5.0f;
     m_maxAngleSpeed = 90.0f;
     m_angleAcc = 90.0f;
-    m_linearAcc = 15.0f;
+    m_linearAcc = 30.0f;
 
     m_isForward = false;
     m_isBack = false;
@@ -35,7 +35,7 @@ void QMGE_FPSCameraController::updateCam(float deltaTime)
     if(m_isForward)
     {
         m_camera->setPosition(m_camera->getTransform().position + m_currentLinearSpeed * deltaTime);
-        m_currentLinearSpeed.length()<m_maxLinearspeed?(m_currentLinearSpeed+=m_camera->getForward()*m_linearAcc*deltaTime):(m_currentLinearSpeed=m_camera->getForward()*m_maxLinearspeed);
+        m_currentLinearSpeed.length()<m_maxLinearspeed?(m_currentLinearSpeed+=m_camera->getForward()*m_linearAcc*deltaTime):(m_currentLinearSpeed);
         moved = true;
     }
     if(m_isBack)

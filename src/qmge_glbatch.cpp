@@ -5,6 +5,7 @@ namespace QMGE_Core
 
 QMGE_GLBatch::QMGE_GLBatch() : QOpenGLExtraFunctions()
 {
+    m_primitiveType = GL_TRIANGLES;
     //set vertex count to 0
     m_vertexCount = 0;
 
@@ -37,6 +38,11 @@ QMGE_GLBatch::~QMGE_GLBatch()
         m_vao.release();
         m_vao.destroy();
     }
+}
+
+void QMGE_GLBatch::setPrimitiveType(GLenum primType)
+{
+    m_primitiveType = primType;
 }
 
 void QMGE_GLBatch::setVertexData(GLfloat * data, GLint vertexCount, QMGE_VAttributes type, QOpenGLBuffer::UsagePattern usage)
@@ -132,7 +138,7 @@ void QMGE_GLBatch::disableBatchVertexAttrib(QMGE_VAttributes attribute,bool unse
 void QMGE_GLBatch::draw()
 {
     m_vao.bind();
-    glDrawArrays(GL_TRIANGLES,0,m_vertexCount);
+    glDrawArrays(m_primitiveType,0,m_vertexCount);
     m_vao.release();
 }
 

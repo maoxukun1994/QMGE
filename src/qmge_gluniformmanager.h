@@ -28,26 +28,36 @@ enum QMGE_UniformType
     MAT4, //7
 };
 
-typedef struct qmgeuniform_h
+class QMGE_HostUniform
 {
-    QMGE_UniformType type;
-    void * dataPointer;
-    unsigned int refCount;
-    //constructor
-    qmgeuniform_h(QMGE_UniformType utype = NOTYPE,void * udataPointer = nullptr):type(utype),dataPointer(udataPointer),refCount(0){}
-}
-QMGE_HostUniform;
 
-typedef struct qmgeuniform_s
-{
-    QString name;
+public:
+
     QMGE_UniformType type;
-    void * data;
+
+    void * dataPtr;
+
+    int refCount;
+
+    QMGE_HostUniform(QMGE_UniformType utype = NOTYPE):type(utype),dataPtr(nullptr),refCount(0){}
+
+};
+
+class QMGE_ShaderUniform
+{
+
+public:
+
+    QString name;
+
+    QMGE_UniformType type;
+
     GLint location;
-    //constructor
-    qmgeuniform_s():name(""),type(QMGE_UniformType::NOTYPE),data(nullptr),location(0){}
-}
-QMGE_ShaderUniform;
+
+    void * dataPtr;
+
+    QMGE_ShaderUniform():name(""),type(NOTYPE),location(0),dataPtr(nullptr){}
+};
 
 
 //the uniform manager needs to be thread-safe
@@ -58,9 +68,9 @@ QMGE_ShaderUniform;
 //so it's other classes' responsibility to assure they don't change the pointer,or
 //called proper functions(such as unregister..etc.)to inform the class that the uniform pointer
 //has changed.
-class QMGE_GLUniformManager : public QObject
+
+class QMGE_GLUniformManager
 {
-    Q_OBJECT
 
 public:
 
@@ -68,13 +78,59 @@ public:
 
     static QMGE_GLUniformManager * getInstance();
 
-    bool registerHostUniform(QString name,QMGE_UniformType type,void * pointer);
+    template<typename T> bool registerUniform(QString name,T type,T * &provider)
+    {
+        bool ret = false;
+        //lock hash table
+        QMutexLocker locker(&m_hashTableLock);
+        //try find item
+        auto item = m_uniforms.find(name);
+        if(item != m_uniforms.end())
+        {
+            //found dumplicate name,not register,just set provider
+            provider = reinterpret_cast<T *>(item.value().dataPtr);
+        }
+        else
+        {
+            //item not found.Register a new one.
+            //make new HostUniform class
+            QMGE_HostUniform newUniform;
+            //check and decide type
+            if( typeid(type) == typeid(int) ) newUniform.type = INT;
+            if( typeid(type) == typeid(float) ) newUniform.type = FLOAT;
+            if( typeid(type) == typeid(QVector2D) ) newUniform.type = VEC2;
+            if( typeid(type) == typeid(QVector3D) ) newUniform.type = VEC3;
+            if( typeid(type) == typeid(QVector4D) ) newUniform.type = VEC4;
+            if( typeid(type) == typeid(QMatrix3x3) ) newUniform.type = MAT3;
+            if( typeid(type) == typeid(QMatrix4x4) ) newUniform.type = MAT4;
 
-    bool unregisterHostUniform(QString name);
+            //if is not one of these types above
+            if(newUniform.type == NOTYPE)
+            {
+                qCritical("Can not register uniform.Unknown type.");
+                //and ret will be a nullptr
+            }
+            else
+            {
+                //allocate memory for this uniform
+                provider = new T(type);
+                //set data pointer
+                newUniform.dataPtr = reinterpret_cast<void *>(provider);
+                newUniform.refCount = 0;
+            }
+            //save
+            m_uniforms.insert(name,newUniform);
+
+            ret = true;
+        }
+        return ret;
+    }
+
+    bool unregisterUniform(QString name);
 
     bool bindShaderUniform(QMGE_ShaderUniform &uniform);
 
-    void unbindShaderUniform(QMGE_ShaderUniform &uniform);
+    bool unbindShaderUniform(QMGE_ShaderUniform &uniform);
 
     QMGE_HostUniform getUniform(QString name);
 
@@ -82,11 +138,13 @@ private:
 
     QMGE_GLUniformManager();
 
+    void deletePtr(QMGE_HostUniform &p);
+
 private:
 
     QHash<QString,QMGE_HostUniform> m_uniforms;
 
-    QMutex m_uniformsWriteLock;
+    QMutex m_hashTableLock;
 };
 
 //class QMGE_GLUniformManager

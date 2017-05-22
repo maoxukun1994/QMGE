@@ -1,6 +1,8 @@
 #ifndef QMGE_GLOBAL_H
 #define QMGE_GLOBAL_H
 
+//std c++
+#include <typeinfo>
 
 //QtCore Header File
 #include <QList>

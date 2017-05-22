@@ -32,6 +32,7 @@ public:
     QMGE_GLBatch();
     ~QMGE_GLBatch();
 
+    void setPrimitiveType(GLenum primType);
     void setVertexData(GLfloat * data,GLint vertexCount,QMGE_VAttributes type,QOpenGLBuffer::UsagePattern usage=QOpenGLBuffer::StaticDraw);
 
     void enableBatchVertexAttrib(QMGE_VAttributes attribute);
@@ -58,6 +59,7 @@ protected:
 
 protected:
 
+    GLenum m_primitiveType;
     //vbos
     QOpenGLBuffer m_vbo[VA_LAST];
     //vao

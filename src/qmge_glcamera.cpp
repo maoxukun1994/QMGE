@@ -3,8 +3,8 @@
 namespace QMGE_Core
 {
 
-QMGE_GLCamera::QMGE_GLCamera(QMGE_CameraPerspective type, QMGE_SceneObject * parent) : QMGE_SceneObject(parent),
-    baseForward(0.0f,1.0f,0.0f),baseUp(0.0f,0.0f,1.0f),baseLeft(-1.0f,0.0f,0.0f)
+QMGE_GLCamera::QMGE_GLCamera(QMGE_CameraPerspective type, QMGE_SceneObject * parent) :
+QMGE_SceneObject(parent),baseForward(0.0f,1.0f,0.0f),baseUp(0.0f,0.0f,1.0f),baseLeft(-1.0f,0.0f,0.0f)
 {
     m_type = type;
 
@@ -19,18 +19,31 @@ QMGE_GLCamera::QMGE_GLCamera(QMGE_CameraPerspective type, QMGE_SceneObject * par
     m_near = 0.1f;
     m_far = 100.0f;
     //perspective
-    m_fov = 90.0f;
-    m_aspect = 1.0f;
+    m_fov = 60.0f;
+    m_aspect = 1.788f;
     //ortho
     m_left = 0.0f;
     m_right = 0.0f;
     m_bottom = 0.0f;
     m_top = 0.0f;
+
+    registerUniforms();
 }
 
 QMGE_GLCamera::~QMGE_GLCamera()
 {
 
+}
+
+void QMGE_GLCamera::registerUniforms()
+{
+    bool status = true;
+    status = status && QMGE_GLUniformManager::getInstance()->registerUniform("vMatrix",QMatrix4x4(),m_vMatrix);
+    status = status && QMGE_GLUniformManager::getInstance()->registerUniform("pMatrix",QMatrix4x4(),m_pMatrix);
+    if(!status)
+    {
+        qFatal("camera uniform register failed.");
+    }
 }
 
 //type
@@ -59,12 +72,12 @@ void QMGE_GLCamera::setOrtho(float left, float right, float bottom, float top, f
 }
 
 //get
-QMatrix4x4 QMGE_GLCamera::getVMatrix()
+QMatrix4x4 * QMGE_GLCamera::getVMatrix()
 {
     return m_vMatrix;
 }
 
-QMatrix4x4 QMGE_GLCamera::getPMatrix()
+QMatrix4x4 * QMGE_GLCamera::getPMatrix()
 {
     return m_pMatrix;
 }
@@ -136,26 +149,26 @@ void QMGE_GLCamera::roll(float degree)
 //update
 void QMGE_GLCamera::updateV()
 {
-    m_vMatrix.setToIdentity();
+    m_vMatrix->setToIdentity();
 
     //including pitch and yaw, not including roll
     m_forward.setZ(qSin(qDegreesToRadians(m_pitchDegree)));
     m_forward.setX(qCos(qDegreesToRadians(m_pitchDegree)) * qCos(qDegreesToRadians(m_yawDegree)));
     m_forward.setY(qCos(qDegreesToRadians(m_pitchDegree)) * qSin(qDegreesToRadians(m_yawDegree)));
     m_forward.normalize();
-    m_vMatrix.lookAt(m_transform.position,m_transform.position+m_forward,m_up);
+    m_vMatrix->lookAt(m_transform.position,m_transform.position+m_forward,m_up);
 }
 
 void QMGE_GLCamera::updateP()
 {
-    m_pMatrix.setToIdentity();
+    m_pMatrix->setToIdentity();
     switch(m_type)
     {
     case QMGE_CameraPerspective::PERSPECTIVE:
-        m_pMatrix.perspective(m_fov,m_aspect,m_near,m_far);
+        m_pMatrix->perspective(m_fov,m_aspect,m_near,m_far);
         break;
     case QMGE_CameraPerspective::ORTHO:
-        m_pMatrix.ortho(m_left,m_right,m_bottom,m_top,m_near,m_far);
+        m_pMatrix->ortho(m_left,m_right,m_bottom,m_top,m_near,m_far);
         break;
     }
 }

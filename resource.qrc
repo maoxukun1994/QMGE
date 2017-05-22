@@ -4,5 +4,16 @@
         <file>shaders/basic.frag</file>
         <file>shaders/basic.vert</file>
         <file>textures/test.png</file>
+        <file>textures/hm.png</file>
+        <file>shaders/geo.config</file>
+        <file>shaders/geo.fs</file>
+        <file>shaders/geo.gs</file>
+        <file>shaders/geo.vs</file>
+        <file>shaders/ground.config</file>
+        <file>shaders/ground.fs</file>
+        <file>shaders/ground.vs</file>
+        <file>shaders/chunk.config</file>
+        <file>shaders/chunk.fs</file>
+        <file>shaders/chunk.vs</file>
     </qresource>
 </RCC>

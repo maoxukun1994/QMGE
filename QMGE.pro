@@ -24,7 +24,11 @@ SOURCES += \
     src/qmge_gluniformmanager.cpp \
     src/qmge_glcamera.cpp \
     src/qmge_sceneobject.cpp \
-    src/qmge_fpscameracontroller.cpp
+    src/qmge_fpscameracontroller.cpp \
+    src/qmge_uniformprovider.cpp \
+    massiveground/massiveground.cpp \
+    massiveground/chunkmanager.cpp \
+    massiveground/chunk.cpp
 
 HEADERS += \
     src/qmge_global.h \
@@ -36,7 +40,11 @@ HEADERS += \
     src/qmge_gluniformmanager.h \
     src/qmge_glcamera.h \
     src/qmge_sceneobject.h \
-    src/qmge_fpscameracontroller.h
+    src/qmge_fpscameracontroller.h \
+    src/qmge_uniformprovider.h \
+    massiveground/massiveground.h \
+    massiveground/chunkmanager.h \
+    massiveground/chunk.h
 
 DISTFILES += \
     README.md \

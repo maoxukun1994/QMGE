@@ -29,6 +29,7 @@ QMGE_Renderer::~QMGE_Renderer()
 
 void QMGE_Renderer::postInit()
 {
+    /**
     //initialize resources
     GLfloat verts[] =
     {
@@ -83,53 +84,64 @@ void QMGE_Renderer::postInit()
         0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,0.0f, 0.0f,0.0f, 1.0f,
         0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,0.0f, 0.0f,0.0f, 1.0f
     };
+    **/
+    /*
+    GLfloat verts[] =
+    {
+        0.0f,0.0f,0.0f,
+        1.0f,0.0f,0.0f,
+        0.0f,1.0f,0.0f,
+
+        0.0f,1.0f,0.0f,
+        1.0f,0.0f,0.0f,
+        1.0f,1.0f,0.0f
+    };
+
+    GLfloat tuvs[] =
+    {
+        0.0f,0.0f,
+        1.0f,0.0f,
+        0.0f,1.0f,
+
+        0.0f,1.0f,
+        1.0f,0.0f,
+        1.0f,1.0f
+    };
 
     batch.reset(new QMGE_GLBatch());
     batch->enableBatchVertexAttrib(VA_POSITION);
     batch->enableBatchVertexAttrib(VA_TUV_0);
-    batch->setVertexData(verts,36,VA_POSITION);
-    batch->setVertexData(tuvs,36,VA_TUV_0);
-    mMatrix.translate(QVector3D(0,2,0));
-    QMGE_GLUniformManager::getInstance()->registerHostUniform("mMatrix",QMGE_UniformType::MAT4,(void *)mMatrix.constData());
-
-    texture.reset(new QOpenGLTexture(QImage(":/textures/test.png")));
-    Q_ASSERT(!texture.isNull());
-    texture->setMinificationFilter(QOpenGLTexture::Linear);
-    texture->setMagnificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    texId = 0;
-    QMGE_GLUniformManager::getInstance()->registerHostUniform("tex",QMGE_UniformType::INT,(void *)&texId);
-
+    batch->setVertexData(verts,6,VA_POSITION);
+    batch->setVertexData(tuvs,6,VA_TUV_0);
+    */
     camera.reset(new QMGE_GLCamera());
     camera->setPosition(0,0,2);
     camera->setPitch(-45.0f);
-    camera->setPerspective(60.0f,1.788f,0.1f,100.0f);
-    QMGE_GLUniformManager::getInstance()->registerHostUniform("vMatrix",QMGE_UniformType::MAT4,(void *)camera->m_vMatrix.constData());
-    QMGE_GLUniformManager::getInstance()->registerHostUniform("pMatrix",QMGE_UniformType::MAT4,(void *)camera->m_pMatrix.constData());
-
+    camera->setPerspective(60.0f,1.788f,0.1f,1000.0f);
+    QMGE_GLUniformManager::getInstance()->registerUniform("vMatrix",QMatrix4x4(),camera->m_vMatrix);
+    QMGE_GLUniformManager::getInstance()->registerUniform("pMatrix",QMatrix4x4(),camera->m_pMatrix);
     camcontrol.reset(new QMGE_FPSCameraController(camera.data()));
 
-    program.reset(new QMGE_GLShaderProgram());
-    program->addShaderFromSourceFile(QOpenGLShader::Vertex,QString(":/shaders/basic.vert"));
-    program->addShaderFromSourceFile(QOpenGLShader::Fragment,QString(":/shaders/basic.frag"));
-    program->setShaderConfigFile(QString(":/shaders/basic.config"));
-    program->linkProgram();
+    m_chunkManager = new ChunkManager();
+    m_chunkManager->loadMap(":/textures/hm.png");
 
     glEnable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
+    glClearColor(0.2f,0.5f,0.8f,1.0f);
+    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+
 }
 
 
 //for user implemented render
 void QMGE_Renderer::render()
 {
-    glClearColor(0.2f,0.5f,0.8f,1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-    texture->bind();
-    program->bind();
-    program->update_frame();
+
     camcontrol->updateCam(0.016f);
     camera->updateV();
-    batch->draw();
-    mMatrix.rotate(1,QVector3D(0,0,1));
+    m_chunkManager->move(camera->getTransform().position);
 }
 
 void QMGE_Renderer::init()
@@ -261,9 +273,10 @@ void QMGE_Renderer::cleanUp()
     //...
     //...
 
-    batch.reset();
-    program.reset();
-    texture.reset();
+    delete m_chunkManager;
+
+
+
 
     //delete openGL context
     //need to put behind all opengl-related resource cleaning-up

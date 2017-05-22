@@ -5,7 +5,11 @@ namespace QMGE_Core
 
 QMGE_GLUniformManager::~QMGE_GLUniformManager()
 {
-
+    //cleaning
+    for(auto p : m_uniforms)
+    {
+        deletePtr(p);
+    }
 }
 
 QMGE_GLUniformManager * QMGE_GLUniformManager::getInstance()
@@ -14,119 +18,78 @@ QMGE_GLUniformManager * QMGE_GLUniformManager::getInstance()
     return &m_instance;
 }
 
-bool QMGE_GLUniformManager::registerHostUniform(QString name,QMGE_UniformType type,void * pointer)
+bool QMGE_GLUniformManager::unregisterUniform(QString name)
 {
     bool ret = false;
-    QMutexLocker locker(&m_uniformsWriteLock);
-
+    //lock hash table
+    QMutexLocker locker(&m_hashTableLock);
+    //try find item
     auto item = m_uniforms.find(name);
+    //found
     if(item != m_uniforms.end())
     {
-        //already has same key.Check values.
-        if(item.value().type == type && item.value().dataPointer == pointer)
+        if(item.value().refCount == 0)
         {
-            qWarning()<<"Uniform already registered.";
-        }
-        else
-        {
-            qWarning("Uniform name conflict detected.Not registering.");
-        }
-    }
-    else
-    {
-        //item not found.Register a new one.
-        m_uniforms.insert(name,QMGE_HostUniform(type,pointer));;
-        ret = true;
-    }
-    return ret;
-}
-
-bool QMGE_GLUniformManager::unregisterHostUniform(QString name)
-{
-    bool ret = false;
-    QMutexLocker locker(&m_uniformsWriteLock);
-
-    auto item = m_uniforms.find(name);
-    if(item != m_uniforms.end())
-    {
-        //found
-        //check reference count
-        if(item.value().refCount != 0)
-        {
-            qWarning("Can not unregister uniform that holds references.");
-        }
-        else
-        {
+            deletePtr((item.value()));
             m_uniforms.erase(item);
             ret = true;
         }
     }
-    else
-    {
-        qWarning("Uniform not found.Can not unregister.");
-    }
-
     return ret;
 }
 
 bool QMGE_GLUniformManager::bindShaderUniform(QMGE_ShaderUniform &uniform)
 {
     bool ret = false;
-    QMutexLocker locker(&m_uniformsWriteLock);
-
+    //lock hash table
+    QMutexLocker locker(&m_hashTableLock);
+    //try find item
     auto item = m_uniforms.find(uniform.name);
+    //found
     if(item != m_uniforms.end())
     {
-        //found
-        //link pointer
-        uniform.data = item.value().dataPointer;
-        //increase reference count
-        ++(item.value().refCount);
-        ret = true;
+        //check if type dismatch
+        if( uniform.type == item.value().type )
+        {
+            //link pointer
+            uniform.dataPtr = item.value().dataPtr;
+            item.value().refCount += 1;
+            ret = true;
+        }
     }
-    else
-    {
-        qWarning("Uniform not found in uniformManager.Can not bind.");
-    }
-
     return ret;
 }
 
-void QMGE_GLUniformManager::unbindShaderUniform(QMGE_ShaderUniform &uniform)
+bool QMGE_GLUniformManager::unbindShaderUniform(QMGE_ShaderUniform &uniform)
 {
-    QMutexLocker locker(&m_uniformsWriteLock);
-
+    bool ret = false;
+    //lock hash table
+    QMutexLocker locker(&m_hashTableLock);
+    //try find item
     auto item = m_uniforms.find(uniform.name);
+    //found
     if(item != m_uniforms.end())
     {
-        //found
         //unlink pointer
-        uniform.data = nullptr;
-        //remove reference count
-        --(item.value().refCount);
+        uniform.dataPtr = nullptr;
+        item.value().refCount -= 1;
+        ret = true;
     }
-    else
-    {
-        qWarning("Uniform not found in uniformManager.Can not unbind.");
-    }
+    return ret;
 }
 
 QMGE_HostUniform QMGE_GLUniformManager::getUniform(QString name)
 {
-    QMGE_HostUniform ret;
-    QMutexLocker locker(&m_uniformsWriteLock);
-
+    QMGE_HostUniform ret(NOTYPE);
+    //lock hash table
+    QMutexLocker locker(&m_hashTableLock);
+    //try find item
     auto item = m_uniforms.find(name);
+    //found
     if(item != m_uniforms.end())
     {
-        //found
         ret = item.value();
     }
-    else
-    {
-        qWarning("Can not get uniform.Uniform not found.");
-    }
-
     return ret;
 }
 
@@ -134,6 +97,39 @@ QMGE_HostUniform QMGE_GLUniformManager::getUniform(QString name)
 QMGE_GLUniformManager::QMGE_GLUniformManager()
 {
 
+}
+
+void QMGE_GLUniformManager::deletePtr(QMGE_HostUniform &p)
+{
+    if(p.dataPtr != nullptr)
+    {
+        switch(p.type)
+        {
+        case INT:
+            delete reinterpret_cast<int *>(p.dataPtr);
+            break;
+        case FLOAT:
+            delete reinterpret_cast<float *>(p.dataPtr);
+            break;
+        case VEC2:
+            delete reinterpret_cast<QVector2D *>(p.dataPtr);
+            break;
+        case VEC3:
+            delete reinterpret_cast<QVector3D *>(p.dataPtr);
+            break;
+        case VEC4:
+            delete reinterpret_cast<QVector4D *>(p.dataPtr);
+            break;
+        case MAT3:
+            delete reinterpret_cast<QMatrix3x3 *>(p.dataPtr);
+            break;
+        case MAT4:
+            delete reinterpret_cast<QMatrix4x4 *>(p.dataPtr);
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 

@@ -20,6 +20,7 @@
 //QtGui Header File
 #include <QWindow>
 #include <QGuiApplication>
+#include <QMouseEvent>
 //QtGui 3d math
 #include <QVector2D>
 #include <QVector3D>

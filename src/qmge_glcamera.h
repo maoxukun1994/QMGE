@@ -23,7 +23,7 @@ public:
     ~QMGE_GLCamera();
 
     //type
-    void setPerspective(float fov,float aspect,float near,float far);
+    void setPerspective(float fov,float aspect,float vnear,float vfar);
     void setOrtho(float left, float right, float bottom, float top, float nearPlane, float farPlane);
 
     //get

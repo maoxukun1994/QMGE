@@ -115,9 +115,9 @@ void QMGE_Renderer::postInit()
     batch->setVertexData(tuvs,6,VA_TUV_0);
     */
     camera.reset(new QMGE_GLCamera());
-    camera->setPosition(0,0,2);
+    camera->setPosition(32,32,32);
     camera->setPitch(-45.0f);
-    camera->setPerspective(60.0f,1.788f,0.1f,1000.0f);
+    camera->setPerspective(75.0f,1.788f,0.1f,1000.0f);
     QMGE_GLUniformManager::getInstance()->registerUniform("vMatrix",QMatrix4x4(),camera->m_vMatrix);
     QMGE_GLUniformManager::getInstance()->registerUniform("pMatrix",QMatrix4x4(),camera->m_pMatrix);
     camcontrol.reset(new QMGE_FPSCameraController(camera.data()));

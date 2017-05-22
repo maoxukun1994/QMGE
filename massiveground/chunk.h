@@ -36,6 +36,11 @@ protected:
 
     void rebuildBatch();
 
+public:
+
+    //used in geomotry shader for animation
+    float m_lifeTime;
+
 private:
 
     QSharedPointer<QMGE_Core::QMGE_GLBatch> m_currentBatch;

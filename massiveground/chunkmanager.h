@@ -1,7 +1,6 @@
 #ifndef CHUNKMANAGER_H
 #define CHUNKMANAGER_H
 
-
 #include <QHash>
 #include <QImage>
 #include "massiveground/chunk.h"
@@ -13,6 +12,8 @@ class ChunkManager
 public:
 
     ChunkManager();
+
+    ~ChunkManager();
 
     void loadMap(QString heightMapFileName);
 
@@ -46,11 +47,8 @@ private:
     float * heightScale;
     int * tex;
     int * ctex;
+    float * time;
     QMatrix4x4 * mMatrix;
-
-    //temp
-    //QMGE_Core::QMGE_GLBatch * testBatch;
-    //Chunk * testChunk;
 };
 
 #endif // CHUNKMANAGER_H

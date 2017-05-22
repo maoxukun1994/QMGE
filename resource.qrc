@@ -15,5 +15,6 @@
         <file>shaders/chunk.config</file>
         <file>shaders/chunk.fs</file>
         <file>shaders/chunk.vs</file>
+        <file>shaders/chunk.geo</file>
     </qresource>
 </RCC>

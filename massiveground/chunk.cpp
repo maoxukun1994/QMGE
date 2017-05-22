@@ -5,6 +5,7 @@ Chunk::Chunk(QPointF start, float size)
     m_startPos = start;
     m_chunkSize = size;
     m_lodLevel = 0;
+    m_lifeTime = 1.5f;
 }
 
 void Chunk::draw()
@@ -12,6 +13,14 @@ void Chunk::draw()
     if(!m_currentBatch.isNull())
     {
         m_currentBatch->draw();
+        if(m_lifeTime > 0)
+        {
+            m_lifeTime -= 0.03f;
+        }
+        else
+        {
+            m_lifeTime = 0.0f;
+        }
     }
     else
     {
@@ -72,14 +81,14 @@ void Chunk::rebuildBatch()
     QPointF vert[3];
     int vertindex;
 
-    for(v = vstart-delta;v > vend;v -= delta)
+    for(v = vstart-delta;v >= vend;v -= delta)
     {
         vert[0].setX(hstart);
         vert[0].setY(v+delta);
         vert[1].setX(hstart);
         vert[1].setY(v);
         vertindex = 2;
-        for(h = hstart+delta;h < hend;++vertindex)
+        for(h = hstart+delta;h <= hend;++vertindex)
         {
             int n,n_1,n_2;
             n = vertindex%3;
@@ -117,4 +126,6 @@ void Chunk::rebuildBatch()
     m_currentBatch.reset(new QMGE_Core::QMGE_GLBatch());
     m_currentBatch->enableBatchVertexAttrib(QMGE_Core::VA_TUV_0);
     m_currentBatch->setVertexData((GLfloat *)vec->data(),(GLint)vec->count()/2,QMGE_Core::VA_TUV_0);
+
+    m_lifeTime = 1.5f;
 }

@@ -2,9 +2,21 @@
 
 ChunkManager::ChunkManager()
 {
-    m_chunkViewDistance = 4;
+    m_chunkViewDistance = 16;
     m_imgMapScaleFactor = 0.05f;
+    //m_imgMapScaleFactor = 0.5f;
     m_chunkSize = 16.0f;
+}
+
+ChunkManager::~ChunkManager()
+{
+    for(auto p : m_chunks)
+    {
+        if(p != nullptr)
+        {
+            delete p;
+        }
+    }
 }
 
 void ChunkManager::loadMap(QString heightMapFileName)
@@ -32,31 +44,16 @@ void ChunkManager::loadMap(QString heightMapFileName)
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("tex",int(0),tex);
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("ctex",int(0),ctex);
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("mMatrix",QMatrix4x4(),mMatrix);
+    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("time",float(0.0f),time);
 
     //init shader
     m_shader.reset(new QMGE_Core::QMGE_GLShaderProgram());
     m_shader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/shaders/chunk.vs");
     m_shader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/shaders/chunk.fs");
+    m_shader->addShaderFromSourceFile(QOpenGLShader::Geometry,":/shaders/chunk.geo");
     m_shader->setShaderConfigFile(":/shaders/chunk.config");
     m_shader->linkProgram();
 
-    /*
-    //setup test batch
-    GLfloat tuvs[] =
-    {
-        0.0f,28.0f,
-        0.0f,0.0f,
-        57.0f,0.0f,
-        57.0f,28.0f,
-        0.0f,28.0f,
-        57.0f,0.0f
-    };
-    testBatch = new QMGE_Core::QMGE_GLBatch();
-    testBatch->enableBatchVertexAttrib(QMGE_Core::VA_TUV_0);
-    testBatch->setVertexData(tuvs,6,QMGE_Core::VA_TUV_0);
-    testChunk = new Chunk(QPointF(0,0),m_chunkSize);
-    testChunk->changeLodTo(0);
-    */
 }
 
 void ChunkManager::update(QVector3D currentPos)
@@ -68,6 +65,7 @@ void ChunkManager::update(QVector3D currentPos)
     {
         if( (it.value()->getStartPos()+QVector2D(m_chunkSize/2,m_chunkSize/2)).distanceToPoint(QVector2D(m_viewPos)) > m_chunkViewDistance * m_chunkSize)
         {
+            if(it.value() != nullptr) delete it.value();
             it = m_chunks.erase(it);
         }
         else
@@ -114,19 +112,15 @@ void ChunkManager::move(QVector3D pos)
     if(pos.distanceToPoint(m_viewPos) > m_chunkSize/5)
     {
         update(pos);
-        qDebug()<<"updated";
     }
-
 
     m_mapTexture->bind();
     m_shader->bind();
     m_shader->update_frame();
-    //testBatch->draw();
-    //testChunk->draw();
-
-
     for(auto p : m_chunks)
     {
+        *time = p->m_lifeTime;
+        m_shader->update_once();
         p->draw();
     }
 }

@@ -38,7 +38,7 @@ public:
     void enableBatchVertexAttrib(QMGE_VAttributes attribute);
     void disableBatchVertexAttrib(QMGE_VAttributes attribute,bool unsetData);
 
-    virtual void draw();
+    void draw();
 
 protected:
 

@@ -47,13 +47,13 @@ void QMGE_GLCamera::registerUniforms()
 }
 
 //type
-void QMGE_GLCamera::setPerspective(float fov,float aspect,float near,float far)
+void QMGE_GLCamera::setPerspective(float fov,float aspect,float vnear,float vfar)
 {
     m_type = QMGE_CameraPerspective::PERSPECTIVE;
     m_fov = fov;
     m_aspect = aspect;
-    m_near = near;
-    m_far = far;
+    m_near = vnear;
+    m_far = vfar;
 
     updateP();
 }

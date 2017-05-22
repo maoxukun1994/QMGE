@@ -24,7 +24,7 @@ void QMGE_App::createWindow(int width,int height,bool isFullScreen)
     {
         config.setRenderableType(QSurfaceFormat::OpenGL);
         config.setProfile(QSurfaceFormat::CoreProfile);
-        config.setVersion(4,3);
+        config.setVersion(4,5);
     }
     else
     {

@@ -47,13 +47,13 @@ void QMGE_FPSCameraController::updateCam(float deltaTime)
     if(m_isLeft)
     {
         m_camera->setPosition(m_camera->getTransform().position + m_currentLinearSpeed * deltaTime);
-        m_currentLinearSpeed.length()<m_maxLinearspeed?(m_currentLinearSpeed+=QVector3D::crossProduct(m_camera->getUp(),m_camera->getForward())*m_linearAcc*deltaTime):(m_currentLinearSpeed=QVector3D::crossProduct(m_camera->getUp(),m_camera->getForward())*m_maxLinearspeed);
+        m_currentLinearSpeed.length()<m_maxLinearspeed?(m_currentLinearSpeed+=QVector3D::crossProduct(m_camera->getUp(),m_camera->getForward())*m_linearAcc*deltaTime):(m_currentLinearSpeed=QVector3D::crossProduct(m_camera->getUp(),m_camera->getForward()).normalized()*m_maxLinearspeed);
         moved = true;
     }
     if(m_isRight)
     {
         m_camera->setPosition(m_camera->getTransform().position + m_currentLinearSpeed * deltaTime);
-        m_currentLinearSpeed.length()<m_maxLinearspeed?(m_currentLinearSpeed-=QVector3D::crossProduct(m_camera->getUp(),m_camera->getForward())*m_linearAcc*deltaTime):(m_currentLinearSpeed=QVector3D::crossProduct(m_camera->getUp(),m_camera->getForward())*(-m_maxLinearspeed));
+        m_currentLinearSpeed.length()<m_maxLinearspeed?(m_currentLinearSpeed-=QVector3D::crossProduct(m_camera->getUp(),m_camera->getForward())*m_linearAcc*deltaTime):(m_currentLinearSpeed=QVector3D::crossProduct(m_camera->getUp(),m_camera->getForward()).normalized()*(-m_maxLinearspeed));
         moved = true;
     }
     if(m_isUp)

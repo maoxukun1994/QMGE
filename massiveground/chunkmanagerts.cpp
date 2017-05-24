@@ -4,9 +4,9 @@ ChunkManagerTS::ChunkManagerTS()
 {
     m_chunkSize = 16.0f;
 
-    m_imgMapScaleFactor = 0.05;
+    m_imgMapScaleFactor = 0.10;
 
-    m_chunkViewDistance = 8;
+    m_chunkViewDistance = 10;
 }
 
 

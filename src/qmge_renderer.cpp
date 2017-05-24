@@ -85,15 +85,13 @@ void QMGE_Renderer::postInit()
         0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,0.0f, 0.0f,0.0f, 1.0f
     };
     **/
+
     /*
     GLfloat verts[] =
     {
         0.0f,0.0f,0.0f,
         1.0f,0.0f,0.0f,
         0.0f,1.0f,0.0f,
-
-        0.0f,1.0f,0.0f,
-        1.0f,0.0f,0.0f,
         1.0f,1.0f,0.0f
     };
 
@@ -102,35 +100,37 @@ void QMGE_Renderer::postInit()
         0.0f,0.0f,
         1.0f,0.0f,
         0.0f,1.0f,
-
-        0.0f,1.0f,
-        1.0f,0.0f,
         1.0f,1.0f
     };
 
-    batch.reset(new QMGE_GLBatch());
-    batch->enableBatchVertexAttrib(VA_POSITION);
-    batch->enableBatchVertexAttrib(VA_TUV_0);
-    batch->setVertexData(verts,6,VA_POSITION);
-    batch->setVertexData(tuvs,6,VA_TUV_0);
+    GLuint indices[] =
+    {
+        0,1,2,2,1,3
+    };
+
+    testBatch.reset(new QMGE_GLBatch());
+    testBatch->enableBatchVertexAttrib(VA_POSITION);
+    testBatch->enableBatchVertexAttrib(VA_TUV_0);
+    testBatch->setVertexData(verts,4,VA_POSITION);
+    testBatch->setVertexData(tuvs,4,VA_TUV_0);
+    testBatch->setIndexData(indices,6);
     */
+
     camera.reset(new QMGE_GLCamera());
-    camera->setPosition(32,32,32);
+    camera->setPosition(32,32,64);
     camera->setPitch(-45.0f);
     camera->setPerspective(75.0f,1.788f,0.1f,1000.0f);
     QMGE_GLUniformManager::getInstance()->registerUniform("vMatrix",QMatrix4x4(),camera->m_vMatrix);
     QMGE_GLUniformManager::getInstance()->registerUniform("pMatrix",QMatrix4x4(),camera->m_pMatrix);
     camcontrol.reset(new QMGE_FPSCameraController(camera.data()));
 
-    m_chunkManager = new ChunkManager();
+    m_chunkManager.reset(new ChunkManagerTS());
     m_chunkManager->loadMap(":/textures/hm.png");
 
     glEnable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
     glEnable(GL_CULL_FACE);
     glClearColor(0.2f,0.5f,0.8f,1.0f);
-    glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-    
+
 #ifdef OPENGL_DESKTOP
     auto f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_5_Core>();
     f->glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
@@ -262,13 +262,13 @@ void QMGE_Renderer::resizeGL(int w, int h)
 
 void QMGE_Renderer::windowKeyChanged(int key,bool pressed)
 {
-    //temp
+    //register key change event
     camcontrol->move(key,pressed);
 }
 
 void QMGE_Renderer::windowMouseMoved(int deltax,int deltay)
 {
-    //temp
+    //register mouse move event
     camcontrol->rotate(-(float)deltax * 0.2,-(float)deltay * 0.2,0);
 }
 
@@ -278,10 +278,7 @@ void QMGE_Renderer::cleanUp()
     //...
     //...
 
-    delete m_chunkManager;
-
-
-
+    m_chunkManager.reset();
 
     //delete openGL context
     //need to put behind all opengl-related resource cleaning-up

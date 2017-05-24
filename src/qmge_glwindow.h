@@ -16,16 +16,17 @@ class QMGE_GLWindow : public QWindow
 
 public:
 
-    QMGE_GLWindow(QSurfaceFormat contextSettings);
+    explicit QMGE_GLWindow(QSurfaceFormat contextSettings,bool isFullScreen = false);
+
     ~QMGE_GLWindow();
+
+    bool isFullScreen();
 
 signals:
 
     void startRenderThread();
     void stopRenderThread();
-
     void resized(int w,int h);
-
     void keyChanged(int key,bool pressed);
     void mouseMoved(int deltax,int deltay);
 
@@ -50,6 +51,7 @@ private:
 
     QPoint m_lastMousePos;
     bool m_mousePressed;
+    bool m_isFullScreen;
 };
 //class QMGE_GLWindow
 

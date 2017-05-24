@@ -3,7 +3,7 @@
 # Please Use QT 5.8 or greater for this project
 #-------------------------------------------------
 
-CONFIG += c++11
+CONFIG += c++11 qt
 QT += core gui widgets
 TARGET = QMGE
 TEMPLATE = app
@@ -26,9 +26,11 @@ SOURCES += \
     src/qmge_sceneobject.cpp \
     src/qmge_fpscameracontroller.cpp \
     src/qmge_uniformprovider.cpp \
-    massiveground/massiveground.cpp \
     massiveground/chunkmanager.cpp \
-    massiveground/chunk.cpp
+    massiveground/chunk.cpp \
+    massiveground/massivegroundwindow.cpp \
+    massiveground/chunkupdater.cpp \
+    massiveground/chunkmanagerts.cpp
 
 HEADERS += \
     src/qmge_global.h \
@@ -42,9 +44,11 @@ HEADERS += \
     src/qmge_sceneobject.h \
     src/qmge_fpscameracontroller.h \
     src/qmge_uniformprovider.h \
-    massiveground/massiveground.h \
     massiveground/chunkmanager.h \
-    massiveground/chunk.h
+    massiveground/chunk.h \
+    massiveground/massivegroundwindow.h \
+    massiveground/chunkupdater.h \
+    massiveground/chunkmanagerts.h
 
 DISTFILES += \
     README.md \
@@ -52,3 +56,6 @@ DISTFILES += \
 
 RESOURCES += \
     resource.qrc
+
+FORMS += \
+    massiveground/massivegroundwindow.ui

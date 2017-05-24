@@ -5,11 +5,24 @@ Chunk::Chunk(QPointF start, float size)
     m_startPos = start;
     m_chunkSize = size;
     m_lodLevel = 0;
+    m_dataBuffer.reset(new QVector<float>);
+    m_dataBuffer->clear();
+    m_batchNeedUpdate = false;
     m_lifeTime = 1.5f;
+}
+
+Chunk::~Chunk()
+{
+    m_dataLocker.unlock();
 }
 
 void Chunk::draw()
 {
+    if(m_batchNeedUpdate)
+    {
+        rebuildBatch();
+    }
+
     if(!m_currentBatch.isNull())
     {
         m_currentBatch->draw();
@@ -22,21 +35,17 @@ void Chunk::draw()
             m_lifeTime = 0.0f;
         }
     }
-    else
-    {
-        rebuildBatch();
-    }
 }
 
-void Chunk::changeLodTo(uint targetLod)
+bool Chunk::changeLodTo(uint targetLod)
 {
-    if(m_lodLevel == targetLod) return;
+    if(targetLod > CHUNK_MAX_LOD_LEVEL) targetLod = CHUNK_MAX_LOD_LEVEL;
 
-    if(targetLod > CHUNK_MAX_LOD_LEVEL) return;
+    if(m_lodLevel == targetLod) return false;
 
     m_lodLevel = targetLod;
 
-    rebuildBatch();
+    return true;
 }
 
 QVector2D Chunk::getStartPos()
@@ -47,7 +56,7 @@ QVector2D Chunk::getStartPos()
 
 QVector3D Chunk::getCenterPos()
 {
-    QVector3D ret(m_startPos.x()+m_chunkSize/2,m_startPos.y()+m_chunkSize/2,0.0f);
+    QVector3D ret(m_startPos.x()+m_chunkSize/2,m_startPos.y()+m_chunkSize/2,m_chunkSize/2);
     return ret;
 }
 
@@ -56,15 +65,23 @@ float Chunk::getSize()
     return m_chunkSize;
 }
 
-
-void Chunk::rebuildBatch()
+uint Chunk::getLod()
 {
+    return m_lodLevel;
+}
+
+void Chunk::calculateBuffer()
+{
+    if(m_batchNeedUpdate) return;
+
+    QMutexLocker locker(&m_dataLocker);
+    m_dataBuffer->clear();
+
     int uCount = (int)qPow(2.0f,(float)(CHUNK_MAX_LOD_LEVEL-m_lodLevel));
     float delta = 1.0f / (float)uCount;
     if(m_chunkSize<delta)
     {
         //reset null
-        m_currentBatch.reset();
         return;
     }
 
@@ -72,9 +89,6 @@ void Chunk::rebuildBatch()
     float hend = m_startPos.x() + m_chunkSize;
     float vstart = m_startPos.y()+m_chunkSize;
     float vend = m_startPos.y();
-
-    QScopedPointer<QVector<float>> vec;
-    vec.reset(new QVector<float>);
 
     float h;
     float v;
@@ -99,12 +113,12 @@ void Chunk::rebuildBatch()
                 vert[n].setX(h);
                 vert[n].setY(v);
 
-                vec->push_back(vert[n_1].x());
-                vec->push_back(vert[n_1].y());
-                vec->push_back(vert[n_2].x());
-                vec->push_back(vert[n_2].y());
-                vec->push_back(vert[n].x());
-                vec->push_back(vert[n].y());
+                m_dataBuffer->push_back(vert[n_1].x());
+                m_dataBuffer->push_back(vert[n_1].y());
+                m_dataBuffer->push_back(vert[n_2].x());
+                m_dataBuffer->push_back(vert[n_2].y());
+                m_dataBuffer->push_back(vert[n].x());
+                m_dataBuffer->push_back(vert[n].y());
 
                 h += delta;
             }
@@ -113,19 +127,25 @@ void Chunk::rebuildBatch()
                 vert[n].setX(h);
                 vert[n].setY(v+delta);
 
-                vec->push_back(vert[n_2].x());
-                vec->push_back(vert[n_2].y());
-                vec->push_back(vert[n_1].x());
-                vec->push_back(vert[n_1].y());
-                vec->push_back(vert[n].x());
-                vec->push_back(vert[n].y());
+                m_dataBuffer->push_back(vert[n_2].x());
+                m_dataBuffer->push_back(vert[n_2].y());
+                m_dataBuffer->push_back(vert[n_1].x());
+                m_dataBuffer->push_back(vert[n_1].y());
+                m_dataBuffer->push_back(vert[n].x());
+                m_dataBuffer->push_back(vert[n].y());
             }
         }
     }
 
+    m_batchNeedUpdate = true;
+}
+
+void Chunk::rebuildBatch()
+{
+    if(!m_batchNeedUpdate || m_dataBuffer->isEmpty()) return;
     m_currentBatch.reset(new QMGE_Core::QMGE_GLBatch());
     m_currentBatch->enableBatchVertexAttrib(QMGE_Core::VA_TUV_0);
-    m_currentBatch->setVertexData((GLfloat *)vec->data(),(GLint)vec->count()/2,QMGE_Core::VA_TUV_0);
-
+    m_currentBatch->setVertexData((GLfloat *)m_dataBuffer->data(),(GLint)m_dataBuffer->count()/2,QMGE_Core::VA_TUV_0);
     m_lifeTime = 1.5f;
+    m_batchNeedUpdate = false;
 }

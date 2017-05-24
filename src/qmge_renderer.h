@@ -6,12 +6,10 @@
 #include "qmge_gluniformmanager.h"
 
 //tempory
-#include "qmge_glbatch.h"
-#include "qmge_glshaderprogram.h"
 #include "qmge_fpscameracontroller.h"
 #include "qmge_glcamera.h"
-//#include "massiveground/massiveground.h"
 #include "massiveground/chunkmanager.h"
+#include "massiveground/chunkmanagerts.h"
 
 namespace QMGE_Core
 {
@@ -64,16 +62,12 @@ private:
 
     //context setting for creating the OpenGL context
     QSurfaceFormat m_contextSettings;
-
     //OpenGL context pointer
     QSharedPointer<QOpenGLContext> m_context;
-
     //indicate whether opengl context is initialized
     volatile bool m_isInitialized;
-
     //indicate whether an update request is waiting
     volatile bool m_updatePending;
-
     //the window this renderer render against
     QMGE_GLWindow * m_renderWindow;
 
@@ -82,7 +76,9 @@ private:
     int m_frames;
     QScopedPointer<QMGE_GLCamera> camera;
     QScopedPointer<QMGE_FPSCameraController> camcontrol;
-    ChunkManager * m_chunkManager;
+
+    //QScopedPointer<ChunkManager> m_chunkManager;
+    QScopedPointer<ChunkManagerTS> m_chunkManager;
 };
 //class QMGE_Renderer
 

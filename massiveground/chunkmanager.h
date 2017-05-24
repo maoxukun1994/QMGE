@@ -1,13 +1,17 @@
 #ifndef CHUNKMANAGER_H
 #define CHUNKMANAGER_H
 
-#include <QHash>
-#include <QImage>
+#include <QThread>
+#include <QObject>
+#include <QOpenGLTexture>
 #include "massiveground/chunk.h"
+#include "massiveground/chunkupdater.h"
 #include "src/qmge_glshaderprogram.h"
+#include "src/qmge_uniformprovider.h"
 
-class ChunkManager
+class ChunkManager : public QObject,public QMGE_Core::QMGE_UniformProvider
 {
+    Q_OBJECT
 
 public:
 
@@ -25,21 +29,25 @@ protected:
 
     uint calculateLod(QVector3D pos1,QVector3D pos2);
 
+    void registerUniforms() Q_DECL_OVERRIDE;
+
+signals:
+
+    void chunkNeedUpdate(Chunk *);
+
 private:
 
     int m_chunkViewDistance;
     float m_imgMapScaleFactor;
     float m_chunkSize;
 
+    QThread m_updateThread;
+    QScopedPointer<ChunkUpdater> m_chunkUpdater;
     QSizeF m_mapSize;
-
     QVector3D m_viewPos;
-
     QSharedPointer<QOpenGLTexture> m_mapTexture;
-
     QSharedPointer<QMGE_Core::QMGE_GLShaderProgram> m_shader;
-
-    QHash<QString,Chunk *> m_chunks;
+    QHash<QString,QSharedPointer<Chunk>> m_chunks;
 
     //shaderuniforms
     float * maxWidth;

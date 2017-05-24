@@ -34,7 +34,7 @@ public:
 
     void setPrimitiveType(GLenum primType);
     void setVertexData(GLfloat * data,GLint vertexCount,QMGE_VAttributes type,QOpenGLBuffer::UsagePattern usage=QOpenGLBuffer::StaticDraw);
-
+    void setIndexData(GLuint *data, GLuint indexCount);
     void enableBatchVertexAttrib(QMGE_VAttributes attribute);
     void disableBatchVertexAttrib(QMGE_VAttributes attribute,bool unsetData);
 
@@ -64,11 +64,16 @@ protected:
     QOpenGLBuffer m_vbo[VA_LAST];
     //vao
     QOpenGLVertexArrayObject m_vao;
+    //"ebo"
+    QScopedPointer<QOpenGLBuffer> m_ebo;
     //vertex count
     GLint m_vertexCount;
     //batch vertex attribute status
     unsigned int m_vertexAttrStatus;
     unsigned int m_vertexAttrExpectedStatus;
+    //whether draw elememts
+    bool m_indexDrawing;
+    GLuint m_indexCount;
 
 };
 //class QMGE_GLBatch

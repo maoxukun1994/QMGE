@@ -12,7 +12,7 @@ QMGE_App::~QMGE_App()
 {
 }
 
-void QMGE_App::createWindow(int width,int height,bool isFullScreen)
+QSharedPointer<QMGE_GLWindow> QMGE_App::createWindow(QSize size, bool isFullScreen)
 {
     QSurfaceFormat config;
     config.setDepthBufferSize(24);
@@ -41,7 +41,10 @@ void QMGE_App::createWindow(int width,int height,bool isFullScreen)
         m_window.reset();
     }
 
-    m_window.reset(new QMGE_GLWindow(config));
+    //create window and set size
+    m_window.reset(new QMGE_GLWindow(config,isFullScreen));
+    m_window->setWidth(size.width());
+    m_window->setHeight(size.height());
 
     //create renderer
     m_renderer.reset(new QMGE_Renderer(config,m_window.data()));
@@ -57,7 +60,7 @@ void QMGE_App::createWindow(int width,int height,bool isFullScreen)
     connect(m_window.data(),SIGNAL(stopRenderThread()),m_renderThread.data(),SLOT(quit()));
     //when render thread quit,do cleaning up on m_renderer
     connect(m_renderThread.data(),SIGNAL(finished()),m_renderer.data(),SLOT(cleanUp()));
-    //when renderer done cleanup,it will emit readyToStop signal,and then we can close the window
+    //when renderer done cleanup,it will emit readyToStop signal,and then we can close the window,quit the app
     connect(m_renderer.data(),SIGNAL(readyToStop()),m_window.data(),SLOT(safeClose()));
 
     //connect other renderer and render window signals/slots
@@ -68,26 +71,29 @@ void QMGE_App::createWindow(int width,int height,bool isFullScreen)
     connect(m_window.data(),SIGNAL(keyChanged(int,bool)),m_renderer.data(),SLOT(windowKeyChanged(int,bool)));
     connect(m_window.data(),SIGNAL(mouseMoved(int,int)),m_renderer.data(),SLOT(windowMouseMoved(int,int)));
 
-    if(isFullScreen)
+    //return window pointer
+    return m_window;
+}
+
+void QMGE_App::run()
+{
+    //check if window created
+    if(m_window.isNull())
+    {
+        createWindow(QSize(0,0),true);
+    }
+
+    //show window
+    if(m_window->isFullScreen())
     {
         m_window->showFullScreen();
     }
     else
     {
-        m_window->setWidth(width);
-        m_window->setHeight(height);
         m_window->show();
     }
-}
 
-
-void QMGE_App::run()
-{
-    if(m_window.isNull())
-    {
-        createWindow(0,0,true);
-    }
-
+    //start render thread
     m_renderThread->start();
 }
 

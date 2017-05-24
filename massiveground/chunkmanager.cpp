@@ -2,21 +2,20 @@
 
 ChunkManager::ChunkManager()
 {
-    m_chunkViewDistance = 16;
+    m_chunkViewDistance = 8;
     m_imgMapScaleFactor = 0.05f;
     //m_imgMapScaleFactor = 0.5f;
     m_chunkSize = 16.0f;
+
+    m_chunkUpdater.reset(new ChunkUpdater());
+
+    connect(this,SIGNAL(chunkNeedUpdate(Chunk*)),m_chunkUpdater.data(),SLOT(updateChunkBatch(Chunk*)));
 }
 
 ChunkManager::~ChunkManager()
 {
-    for(auto p : m_chunks)
-    {
-        if(p != nullptr)
-        {
-            delete p;
-        }
-    }
+    m_updateThread.quit();
+    m_updateThread.wait();
 }
 
 void ChunkManager::loadMap(QString heightMapFileName)
@@ -25,7 +24,7 @@ void ChunkManager::loadMap(QString heightMapFileName)
 
     if(img.isNull())
     {
-        qFatal("Can not load ground image file.");
+        qFatal("Can not load image file.");
         return;
     }
     m_mapSize.setWidth(img.width()*m_imgMapScaleFactor);
@@ -37,44 +36,24 @@ void ChunkManager::loadMap(QString heightMapFileName)
     m_mapTexture->setMinificationFilter(QOpenGLTexture::Linear);
 
     //setup uniforms
-    //shaderuniforms
-    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("maxWidth",(float)m_mapSize.width(),maxWidth);
-    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("maxHeight",(float)m_mapSize.height(),maxHeight);
-    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("heightScale",float(15.0f),heightScale);
-    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("tex",int(0),tex);
-    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("ctex",int(0),ctex);
-    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("mMatrix",QMatrix4x4(),mMatrix);
-    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("time",float(0.0f),time);
+    registerUniforms();
 
     //init shader
     m_shader.reset(new QMGE_Core::QMGE_GLShaderProgram());
     m_shader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/shaders/chunk.vs");
     m_shader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/shaders/chunk.fs");
-    m_shader->addShaderFromSourceFile(QOpenGLShader::Geometry,":/shaders/chunk.geo");
+    m_shader->addShaderFromSourceFile(QOpenGLShader::Geometry,":/shaders/chunk.gs");
     m_shader->setShaderConfigFile(":/shaders/chunk.config");
     m_shader->linkProgram();
 
+    m_chunkUpdater->moveToThread(&m_updateThread);
+    m_updateThread.start();
 }
 
 void ChunkManager::update(QVector3D currentPos)
 {
     m_viewPos = currentPos;
-    //remove old chunks
-    auto it = m_chunks.begin();
-    while (it != m_chunks.end())
-    {
-        if( (it.value()->getStartPos()+QVector2D(m_chunkSize/2,m_chunkSize/2)).distanceToPoint(QVector2D(m_viewPos)) > m_chunkViewDistance * m_chunkSize)
-        {
-            if(it.value() != nullptr) delete it.value();
-            it = m_chunks.erase(it);
-        }
-        else
-        {
-            it.value()->changeLodTo(calculateLod(it.value()->getCenterPos(),m_viewPos));
-            ++it;
-        }
-    }
-    //insert new
+    //calculate area
     QPoint viewSector,startSector,endSector,maxSector;
     viewSector.setX((int)(m_viewPos.x()/m_chunkSize));
     viewSector.setY((int)(m_viewPos.y()/m_chunkSize));
@@ -84,6 +63,34 @@ void ChunkManager::update(QVector3D currentPos)
     startSector.setY(viewSector.y()-m_chunkViewDistance);
     endSector.setX(viewSector.x()+m_chunkViewDistance);
     endSector.setY(viewSector.y()+m_chunkViewDistance);
+    //remove and update old chunks
+    auto it = m_chunks.begin();
+    while (it != m_chunks.end())
+    {
+        QPoint actualSector;
+        actualSector.setX((it.value()->getStartPos().x()+1)/m_chunkSize);
+        actualSector.setY((it.value()->getStartPos().y()+1)/m_chunkSize);
+        if(actualSector.x()<startSector.x() || actualSector.x()>endSector.x() || actualSector.y()<startSector.y() || actualSector.y()>endSector.y())
+        {
+            //remove
+            if(!it.value().isNull())
+            {
+                //get locker
+                it.value()->m_dataLocker.lock();
+                it.value().reset();
+            }
+            it = m_chunks.erase(it);            
+        }
+        else
+        {
+            if(it.value()->changeLodTo(calculateLod(it.value()->getCenterPos(),m_viewPos)))
+            {
+                emit chunkNeedUpdate(it.value().data());
+            }
+            ++it;
+        }
+    }
+    //insert new
     for(int i = startSector.y();i <= endSector.y();++i)
     {
         for(int j = startSector.x();j <= endSector.x();++j)
@@ -98,8 +105,13 @@ void ChunkManager::update(QVector3D currentPos)
             if(m_chunks.find(key) != m_chunks.end()) continue;
             else
             {
-                auto newChunk = new Chunk(QPointF(m_chunkSize*j,m_chunkSize*i),m_chunkSize);
-                newChunk->changeLodTo(calculateLod(newChunk->getCenterPos(),m_viewPos));
+                auto cp = new Chunk(QPointF(m_chunkSize*j,m_chunkSize*i),m_chunkSize);
+                QSharedPointer<Chunk> newChunk;
+                newChunk.reset(cp);
+                if(newChunk->changeLodTo(calculateLod(newChunk->getCenterPos(),m_viewPos)))
+                {
+                    emit chunkNeedUpdate(newChunk.data());
+                }
                 m_chunks.insert(key,newChunk);
             }
         }
@@ -109,7 +121,7 @@ void ChunkManager::update(QVector3D currentPos)
 
 void ChunkManager::move(QVector3D pos)
 {
-    if(pos.distanceToPoint(m_viewPos) > m_chunkSize/5)
+    if(pos.distanceToPoint(m_viewPos) > m_chunkSize/3)
     {
         update(pos);
     }
@@ -131,4 +143,15 @@ uint ChunkManager::calculateLod(QVector3D pos1,QVector3D pos2)
     uint lod = distance / (m_chunkSize/3);
     if(lod > CHUNK_MAX_LOD_LEVEL) lod = CHUNK_MAX_LOD_LEVEL;
     return lod;
+}
+
+void ChunkManager::registerUniforms()
+{
+    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("maxWidth",(float)m_mapSize.width(),maxWidth);
+    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("maxHeight",(float)m_mapSize.height(),maxHeight);
+    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("heightScale",float(m_chunkSize),heightScale);
+    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("tex",int(0),tex);
+    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("ctex",int(0),ctex);
+    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("mMatrix",QMatrix4x4(),mMatrix);
+    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("time",float(0.0f),time);
 }

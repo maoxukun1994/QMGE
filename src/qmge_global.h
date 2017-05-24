@@ -19,8 +19,9 @@
 
 //QtGui Header File
 #include <QWindow>
-#include <QGuiApplication>
 #include <QMouseEvent>
+#include <QApplication>
+#include <QGuiApplication>
 //QtGui 3d math
 #include <QVector2D>
 #include <QVector3D>

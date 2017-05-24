@@ -1,12 +1,11 @@
-#include "qmge_app.h"
-
+#include "src/qmge_app.h"
 
 int main(int argc,char ** argv)
 {
-    QGuiApplication a(argc,argv);
+    QApplication a(argc,argv);
 
     QScopedPointer<QMGE_Core::QMGE_App> app(new QMGE_Core::QMGE_App());
-    app->createWindow(1280,720,false);
+    app->createWindow(QSize(1280,729),false);
     //app->createWindow(0,0,true);
     app->run();
 

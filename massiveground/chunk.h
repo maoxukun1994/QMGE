@@ -2,10 +2,13 @@
 #define CHUNK_H
 
 #include <QSize>
+#include <QDateTime>
 #include <QSizeF>
 #include <QPoint>
 #include <QPointF>
 #include <QVector>
+#include <QMutex>
+#include <QMutexLocker>
 #include <QVector2D>
 #include <QVector3D>
 #include <QScopedPointer>
@@ -24,13 +27,21 @@ public:
 
     Chunk(QPointF start, float size);
 
+    ~Chunk();
+
     void draw();
 
-    void changeLodTo(uint targetLod);
+    bool changeLodTo(uint targetLod);
 
     QVector2D getStartPos();
+
     QVector3D getCenterPos();
+
     float getSize();
+
+    uint getLod();
+
+    void calculateBuffer();
 
 protected:
 
@@ -41,9 +52,15 @@ public:
     //used in geomotry shader for animation
     float m_lifeTime;
 
+    QMutex m_dataLocker;
+
 private:
 
     QSharedPointer<QMGE_Core::QMGE_GLBatch> m_currentBatch;
+
+    volatile bool m_batchNeedUpdate;
+
+    QScopedPointer<QVector<float>> m_dataBuffer;
 
     QPointF m_startPos;
 

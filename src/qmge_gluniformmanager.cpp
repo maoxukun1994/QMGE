@@ -34,6 +34,10 @@ bool QMGE_GLUniformManager::unregisterUniform(QString name)
             m_uniforms.erase(item);
             ret = true;
         }
+        else
+        {
+            qWarning()<<"Can not unregister uniform that has a refcount not 0.";
+        }
     }
     return ret;
 }
@@ -127,6 +131,7 @@ void QMGE_GLUniformManager::deletePtr(QMGE_HostUniform &p)
             delete reinterpret_cast<QMatrix4x4 *>(p.dataPtr);
             break;
         default:
+            qWarning()<<"Unknown data pointer type in uniform manager.Can not delete.";
             break;
         }
     }

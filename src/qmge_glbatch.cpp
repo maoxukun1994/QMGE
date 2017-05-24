@@ -14,6 +14,10 @@ QMGE_GLBatch::QMGE_GLBatch() : QOpenGLExtraFunctions()
     //all expected status as 0(none)
     m_vertexAttrExpectedStatus = 0;
 
+    m_indexDrawing = false;
+
+    m_indexCount = 0;
+
     //ensure gl functions are loaded before any gl call starts
     initializeOpenGLFunctions();
 
@@ -109,6 +113,22 @@ void QMGE_GLBatch::setVertexData(GLfloat * data, GLint vertexCount, QMGE_VAttrib
     updateVAO();
 }
 
+void QMGE_GLBatch::setIndexData(GLuint * data,GLuint indexCount)
+{
+    m_ebo.reset(new QOpenGLBuffer(QOpenGLBuffer::IndexBuffer));
+    if(m_ebo->create() && m_ebo->bind())
+    {
+        m_ebo->allocate(data,sizeof(GLuint)*indexCount);
+        m_ebo->release();
+        m_indexCount = indexCount;
+        m_indexDrawing = true;
+    }
+    else
+    {
+        qFatal("Can not set index buffer data!");
+    }
+}
+
 //if attribute set to VA_LAST,will disable all attributes
 void QMGE_GLBatch::enableBatchVertexAttrib(QMGE_VAttributes attribute)
 {
@@ -138,7 +158,16 @@ void QMGE_GLBatch::disableBatchVertexAttrib(QMGE_VAttributes attribute,bool unse
 void QMGE_GLBatch::draw()
 {
     m_vao.bind();
-    glDrawArrays(m_primitiveType,0,m_vertexCount);
+    if(m_indexDrawing)
+    {
+        m_ebo->bind();
+        glDrawElements(m_primitiveType,m_indexCount,GL_UNSIGNED_INT,0);
+        m_ebo->release();
+    }
+    else
+    {
+        glDrawArrays(m_primitiveType,0,m_vertexCount);
+    }
     m_vao.release();
 }
 

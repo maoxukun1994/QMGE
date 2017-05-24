@@ -4,16 +4,22 @@
 namespace QMGE_Core
 {
 
-QMGE_GLWindow::QMGE_GLWindow(QSurfaceFormat contextSettings):QWindow()
+QMGE_GLWindow::QMGE_GLWindow(QSurfaceFormat contextSettings, bool isFullScreen):QWindow()
 {
     setSurfaceType(QSurface::OpenGLSurface);
     setFormat(contextSettings);
-
+    setMouseGrabEnabled(true);
     m_mousePressed = false;
+    m_isFullScreen = isFullScreen;
 }
 
 QMGE_GLWindow::~QMGE_GLWindow()
 {
+}
+
+bool QMGE_GLWindow::isFullScreen()
+{
+    return m_isFullScreen;
 }
 
 void QMGE_GLWindow::postRendererInitialized()

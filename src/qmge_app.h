@@ -18,15 +18,15 @@ public:
     ~QMGE_App();
 
     //create window,along with renderer.
-    void createWindow(int width,int height,bool isFullScreen = true);
+    QSharedPointer<QMGE_GLWindow> createWindow(QSize size,bool isFullScreen = true);
 
     void run();
 
 private:
 
     QScopedPointer<QThread> m_renderThread;
-    QScopedPointer<QMGE_GLWindow> m_window;
-    QScopedPointer<QMGE_Renderer> m_renderer;
+    QSharedPointer<QMGE_GLWindow> m_window;
+    QSharedPointer<QMGE_Renderer> m_renderer;
 
 };
 //class QMGE_App

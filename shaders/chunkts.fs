@@ -13,7 +13,7 @@ void main()
 {
     if(gl_FragCoord.x > 640)
     {
-        color = vec4(texture(tex,tuv.xy)) * min((30.0f/distanceToLight),1.0f);
+        color = vec4(texture(tex,tuv.xy)) * min((80.0f/distanceToLight),1.0f);
     }
     else
     {

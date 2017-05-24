@@ -13,7 +13,7 @@ class QMGE_FPSCameraController : public QObject
 
 public:
 
-    QMGE_FPSCameraController(QMGE_GLCamera * cam);
+    QMGE_FPSCameraController(QSharedPointer<QMGE_GLCamera> cam);
 
     void updateCam(float deltaTime);
 
@@ -31,7 +31,7 @@ public slots:
 
 private:
 
-    QMGE_GLCamera * m_camera;
+    QSharedPointer<QMGE_GLCamera> m_camera;
 
     QVector3D m_currentLinearSpeed;
     QVector3D m_destRot;

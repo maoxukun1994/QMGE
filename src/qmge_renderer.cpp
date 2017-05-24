@@ -119,17 +119,18 @@ void QMGE_Renderer::postInit()
     camera.reset(new QMGE_GLCamera());
     camera->setPosition(32,32,64);
     camera->setPitch(-45.0f);
+    camera->setYaw(45.0f);
     camera->setPerspective(75.0f,1.788f,0.1f,1000.0f);
     QMGE_GLUniformManager::getInstance()->registerUniform("vMatrix",QMatrix4x4(),camera->m_vMatrix);
     QMGE_GLUniformManager::getInstance()->registerUniform("pMatrix",QMatrix4x4(),camera->m_pMatrix);
-    camcontrol.reset(new QMGE_FPSCameraController(camera.data()));
+    camcontrol.reset(new QMGE_FPSCameraController(camera));
 
     m_chunkManager.reset(new ChunkManagerTS());
-    m_chunkManager->loadMap(":/textures/hm.png");
+    m_chunkManager->loadMap(":/textures/hm3.png");
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    glClearColor(0.2f,0.5f,0.8f,1.0f);
+    glClearColor(0.2f,0.2f,0.4f,1.0f);
 
 #ifdef OPENGL_DESKTOP
     auto f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_5_Core>();
@@ -145,7 +146,6 @@ void QMGE_Renderer::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     camcontrol->updateCam(0.016f);
-    camera->updateV();
     m_chunkManager->move(camera->getTransform().position);
 }
 
@@ -277,7 +277,8 @@ void QMGE_Renderer::cleanUp()
     //do clean up jobs
     //...
     //...
-
+    camcontrol.reset();
+    camera.reset();
     m_chunkManager.reset();
 
     //delete openGL context

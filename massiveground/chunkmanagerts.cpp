@@ -2,11 +2,11 @@
 
 ChunkManagerTS::ChunkManagerTS()
 {
-    m_chunkSize = 16.0f;
+    m_chunkSize = 32.0f;
 
-    m_imgMapScaleFactor = 0.10;
+    m_imgMapScaleFactor = 0.5;
 
-    m_chunkViewDistance = 10;
+    m_chunkViewDistance = 8;
 }
 
 
@@ -123,7 +123,7 @@ void ChunkManagerTS::registerUniforms()
 {
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("maxWidth",(float)m_mapSize.width(),maxWidth);
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("maxHeight",(float)m_mapSize.height(),maxHeight);
-    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("heightScale",float(m_chunkSize),heightScale);
+    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("heightScale",float(256),heightScale);
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("tex",int(0),tex);
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("mMatrix",QMatrix4x4(),mMatrix);
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("viewPos",QVector3D(),viewPos);

@@ -74,8 +74,8 @@ private:
     //temporary
     //count fps
     int m_frames;
-    QScopedPointer<QMGE_GLCamera> camera;
-    QScopedPointer<QMGE_FPSCameraController> camcontrol;
+    QSharedPointer<QMGE_GLCamera> camera;
+    QSharedPointer<QMGE_FPSCameraController> camcontrol;
 
     //QScopedPointer<ChunkManager> m_chunkManager;
     QScopedPointer<ChunkManagerTS> m_chunkManager;

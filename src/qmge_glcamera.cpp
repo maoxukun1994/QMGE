@@ -110,26 +110,23 @@ QVector3D QMGE_GLCamera::getUp()
 void QMGE_GLCamera::setPitch(float degree)
 {
     m_pitchDegree = degree;
-    updateV();
 }
 
 void QMGE_GLCamera::setYaw(float degree)
 {
     m_yawDegree = degree;
-    updateV();
 }
 
 void QMGE_GLCamera::setRoll(float degree)
 {
     m_rollDegree = degree;
-    updateV();
 }
 
 void QMGE_GLCamera::pitch(float degree)
 {
     m_pitchDegree += degree;
-    if(m_pitchDegree > 89.0f) m_pitchDegree = 89.0f;
-    if(m_pitchDegree < -89.0f) m_pitchDegree = -89.0f;
+    if(m_pitchDegree > 85.0f) m_pitchDegree = 85.0f;
+    if(m_pitchDegree < -85.0f) m_pitchDegree = -85.0f;
 }
 
 void QMGE_GLCamera::yaw(float degree)

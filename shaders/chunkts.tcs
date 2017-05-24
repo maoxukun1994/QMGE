@@ -15,8 +15,8 @@ float level(vec4 poz1, vec4 poz2)
 	if(d<5) lod = 16;
 	if(5<=d && d<10) lod=10;
 	if(10<=d && d<20) lod=8;
-	if(20<=d && d<40) lod=4;
-	if(40<=d && d<50) lod=2;
+        if(20<=d && d<30) lod=4;
+        if(30<=d && d<40) lod=2;
 	return lod;
 }
 

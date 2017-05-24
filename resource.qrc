@@ -3,8 +3,6 @@
         <file>shaders/basic.config</file>
         <file>shaders/basic.frag</file>
         <file>shaders/basic.vert</file>
-        <file>textures/test.png</file>
-        <file>textures/hm.png</file>
         <file>shaders/geo.config</file>
         <file>shaders/geo.fs</file>
         <file>shaders/geo.gs</file>
@@ -19,5 +17,9 @@
         <file>shaders/chunkts.tcs</file>
         <file>shaders/chunkts.gs</file>
         <file>shaders/chunkts.config</file>
+        <file>textures/hm1.jpg</file>
+        <file>textures/hm2.jpg</file>
+        <file>textures/hm3.png</file>
+        <file>textures/hm4.png</file>
     </qresource>
 </RCC>

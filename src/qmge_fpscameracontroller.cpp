@@ -3,11 +3,12 @@
 namespace QMGE_Core
 {
 
-QMGE_FPSCameraController::QMGE_FPSCameraController(QMGE_GLCamera * camera)
+QMGE_FPSCameraController::QMGE_FPSCameraController(QSharedPointer<QMGE_GLCamera> camera)
 {
-    if(camera == nullptr)
+    if(camera.isNull())
     {
-        qFatal("Can not set camera controller to null camera.");
+        qWarning("Can not set camera controller to null camera.");
+        camera.reset(new QMGE_GLCamera());
     }
     else
     {
@@ -15,7 +16,7 @@ QMGE_FPSCameraController::QMGE_FPSCameraController(QMGE_GLCamera * camera)
     }
     m_currentAngleSpeed = 0.0f;
     m_destRot = QVector3D(camera->getPitch(),camera->getYaw(),camera->getRoll());
-    m_maxLinearspeed = 10.0f;
+    m_maxLinearspeed = 30.0f;
     m_maxAngleSpeed = 90.0f;
     m_angleAcc = 90.0f;
     m_linearAcc = 20.0f;
@@ -75,91 +76,7 @@ void QMGE_FPSCameraController::updateCam(float deltaTime)
         m_camera->setPosition(m_camera->getTransform().position + m_currentLinearSpeed * deltaTime);
     }
 
-
-
-    m_camera->setPitch(m_destRot.x());
-    m_camera->setYaw(m_destRot.y());
-    m_camera->pitch(m_destRot.x() - m_camera->getPitch());
-    m_camera->yaw(m_destRot.y() - m_camera->getYaw());
-    /*
-    float deltax,deltay,deltaz;
-    deltax = m_destRot.x() - m_camera->getPitch();
-    deltay = m_destRot.y() - m_camera->getYaw();
-    deltaz = m_destRot.z() - m_camera->getRoll();
-
-    moved = false;
-    if(deltax>0)
-    {
-        if(deltax < deltaTime * m_currentAngleSpeed)
-        {
-            m_camera->setPitch(m_camera->getPitch() + deltax);
-            m_currentAngleSpeed = deltax;
-        }
-        else m_camera->setPitch(m_camera->getPitch() + deltaTime * m_currentAngleSpeed);
-        m_currentAngleSpeed += m_angleAcc * deltaTime;
-        moved = true;
-    }
-    else
-    {
-        if(deltax != 0) moved = true;
-        if(deltax > (-deltaTime) * m_currentAngleSpeed)
-        {
-            m_camera->setPitch(m_camera->getPitch() + deltax);
-            m_currentAngleSpeed = -deltax;
-        }
-        else m_camera->setPitch(m_camera->getPitch() - deltaTime * m_currentAngleSpeed);
-        m_currentAngleSpeed += m_angleAcc * deltaTime;
-    }
-
-    if(deltay>0)
-    {
-        if(deltay < deltaTime * m_currentAngleSpeed)
-        {
-            m_camera->setYaw(m_camera->getYaw() + deltay);
-            m_currentAngleSpeed = deltax;
-        }
-        else m_camera->setYaw(m_camera->getYaw() + deltaTime * m_currentAngleSpeed);
-        m_currentAngleSpeed += m_angleAcc * deltaTime;
-        moved = true;
-    }
-    else
-    {
-        if(deltax != 0) moved = true;
-        if(deltay > (-deltaTime) * m_currentAngleSpeed)
-        {
-            m_camera->setYaw(m_camera->getYaw() + deltay);
-            m_currentAngleSpeed = -deltax;
-        }
-        else m_camera->setPitch(m_camera->getYaw() - deltaTime * m_currentAngleSpeed);
-        m_currentAngleSpeed += m_angleAcc * deltaTime;
-    }
-
-    if(deltaz>0)
-    {
-        if(deltaz < deltaTime * m_currentAngleSpeed)
-        {
-            m_camera->setRoll(m_camera->getRoll() + deltaz);
-            m_currentAngleSpeed = deltax;
-        }
-        else m_camera->setRoll(m_camera->getRoll() + deltaTime * m_currentAngleSpeed);
-        m_currentAngleSpeed += m_angleAcc * deltaTime;
-        moved = true;
-    }
-    else
-    {
-        if(deltax != 0) moved = true;
-        if(deltaz > (-deltaTime) * m_currentAngleSpeed)
-        {
-            m_camera->setRoll(m_camera->getRoll() + deltaz);
-            m_currentAngleSpeed = -deltax;
-        }
-        else m_camera->setRoll(m_camera->getRoll() - deltaTime * m_currentAngleSpeed);
-        m_currentAngleSpeed += m_angleAcc * deltaTime;
-    }
-
-    if(!moved) m_currentAngleSpeed = 0.0f;
-    */
-
+    m_camera->updateV();
 }
 
 void QMGE_FPSCameraController::setMaxLinearSpeed(float speed)
@@ -186,7 +103,13 @@ void QMGE_FPSCameraController::move(int keyCode,bool start)
     case Qt::Key_Up:
         m_isUp = start;
         break;
+    case Qt::Key_Q:
+        m_isUp = start;
+        break;
     case Qt::Key_Down:
+        m_isDown = start;
+        break;
+    case Qt::Key_E:
         m_isDown = start;
         break;
     case Qt::Key_A:
@@ -202,16 +125,16 @@ void QMGE_FPSCameraController::move(int keyCode,bool start)
 
 void QMGE_FPSCameraController::rotate(QVector3D rot)
 {
-    m_destRot.setX(m_destRot.x() + rot.x());
-    m_destRot.setY(m_destRot.y() + rot.y());
-    m_destRot.setZ(m_destRot.z() + rot.z());
+    m_camera->pitch(rot.x());
+    m_camera->yaw(rot.y());
+    m_camera->roll(rot.z());
 }
 
 void QMGE_FPSCameraController::rotate(float x,float y,float z)
 {
-    m_destRot.setX(m_destRot.x() + x);
-    m_destRot.setY(m_destRot.y() + y);
-    m_destRot.setZ(m_destRot.z() + z);
+    m_camera->pitch(x);
+    m_camera->yaw(y);
+    m_camera->roll(z);
 }
 
 

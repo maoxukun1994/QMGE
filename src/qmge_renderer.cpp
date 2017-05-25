@@ -117,7 +117,7 @@ void QMGE_Renderer::postInit()
     */
 
     camera.reset(new QMGE_GLCamera());
-    camera->setPosition(32,32,64);
+    camera->setPosition(320,320,64);
     camera->setPitch(-45.0f);
     camera->setYaw(45.0f);
     camera->setPerspective(75.0f,1.788f,0.1f,1000.0f);
@@ -126,7 +126,7 @@ void QMGE_Renderer::postInit()
     camcontrol.reset(new QMGE_FPSCameraController(camera));
 
     m_chunkManager.reset(new ChunkManagerTS());
-    m_chunkManager->loadMap(":/textures/hm1.jpg",":/textures/hm1_norm.jpg");
+    m_chunkManager->loadMap(":/textures/hm3.png",":/textures/hm3_norm.jpg");
 
     lineMode = false;
 

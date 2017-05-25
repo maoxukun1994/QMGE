@@ -21,6 +21,5 @@
         <file>textures/hm2.jpg</file>
         <file>textures/hm3.png</file>
         <file>textures/hm3_norm.jpg</file>
-        <file>textures/hm1_norm.jpg</file>
     </qresource>
 </RCC>

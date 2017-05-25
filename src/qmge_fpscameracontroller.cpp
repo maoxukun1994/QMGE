@@ -15,7 +15,6 @@ QMGE_FPSCameraController::QMGE_FPSCameraController(QSharedPointer<QMGE_GLCamera>
         m_camera = camera;
     }
     m_currentAngleSpeed = 0.0f;
-    m_destRot = QVector3D(camera->getPitch(),camera->getYaw(),camera->getRoll());
     m_maxLinearspeed = 30.0f;
     m_maxAngleSpeed = 90.0f;
     m_angleAcc = 90.0f;
@@ -88,6 +87,16 @@ void QMGE_FPSCameraController::setMaxLinearSpeed(float speed)
 void QMGE_FPSCameraController::setMaxAngleSpeed(float speed)
 {
     m_maxAngleSpeed = speed;
+}
+
+void QMGE_FPSCameraController::stop()
+{
+    m_currentLinearSpeed = QVector3D();
+}
+
+QVector3D QMGE_FPSCameraController::getLinearVelocity()
+{
+    return m_currentLinearSpeed;
 }
 
 void QMGE_FPSCameraController::move(int keyCode,bool start)

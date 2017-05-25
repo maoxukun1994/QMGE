@@ -52,7 +52,8 @@ HEADERS += \
 
 DISTFILES += \
     README.md \
-    MEMO.md
+    MEMO.md \
+    massiveground/Collision
 
 RESOURCES += \
     resource.qrc

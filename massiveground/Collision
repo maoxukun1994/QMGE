@@ -1,0 +1,55 @@
+static bool IntersectTriangle(QVector3D orig,QVector3D dir,QVector3D v0, QVector3D v1, QVector3D v2,
+    float* t, float* u, float* v)
+{
+    //dir.normalize();
+    // E1
+    QVector3D E1 = v1 - v0;
+
+    // E2
+    QVector3D E2 = v2 - v0;
+
+    // P
+    QVector3D P = QVector3D::crossProduct(dir,E2);// dir.Cross(E2);
+
+    // determinant
+    float det =  QVector3D::dotProduct(E1,P);//E1.Dot(P);
+
+    // keep det > 0, modify T accordingly
+    QVector3D T;
+    if( det >0 )
+    {
+        T = orig - v0;
+    }
+    else
+    {
+        T = v0 - orig;
+        det = -det;
+    }
+
+    // If determinant is near zero, ray lies in plane of triangle
+    if( det < 0.0001f )
+        return false;
+
+    // Calculate u and make sure u <= 1
+    *u =  QVector3D::dotProduct(T,P);//T.Dot(P);
+    if( *u < 0.0f || *u > det )
+        return false;
+
+    // Q
+    QVector3D Q = QVector3D::crossProduct(T,E1);//T.Cross(E1);
+
+    // Calculate v and make sure u + v <= 1
+    *v = QVector3D::dotProduct(dir,Q);//dir.Dot(Q);
+    if( *v < 0.0f || *u + *v > det )
+        return false;
+
+    // Calculate t, scale parameters, ray intersects triangle
+    *t = QVector3D::dotProduct(E2,Q);//E2.Dot(Q);
+
+    float fInvDet = 1.0f / det;
+    *t *= fInvDet;
+    *u *= fInvDet;
+    *v *= fInvDet;
+
+    return true;
+}

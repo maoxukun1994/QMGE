@@ -4,28 +4,41 @@ ChunkManagerTS::ChunkManagerTS()
 {
     m_chunkSize = 32.0f;
 
-    m_imgMapScaleFactor = 0.5;
+    m_imgMapScaleFactor = 0.2;
 
     m_chunkViewDistance = 8;
 }
 
 
-void ChunkManagerTS::loadMap(QString heightMapFileName)
+void ChunkManagerTS::loadMap(QString heightMapFileName, QString normalMapFilename)
 {
-    QImage img(heightMapFileName);
-
-    if(img.isNull())
+    QImage m_img;
+    m_img.load(heightMapFileName);
+    if(m_img.isNull())
     {
         qFatal("Can not load image file.");
         return;
     }
-    m_mapSize.setWidth(img.width()*m_imgMapScaleFactor);
-    m_mapSize.setHeight(img.height()*m_imgMapScaleFactor);
+    m_mapSize.setWidth(m_img.width()*m_imgMapScaleFactor);
+    m_mapSize.setHeight(m_img.height()*m_imgMapScaleFactor);
 
     //set texture
-    m_mapTexture.reset(new QOpenGLTexture(img));
+    m_mapTexture.reset(new QOpenGLTexture(m_img));
     m_mapTexture->setMagnificationFilter(QOpenGLTexture::LinearMipMapLinear);
     m_mapTexture->setMinificationFilter(QOpenGLTexture::Linear);
+
+    QImage normalMap(normalMapFilename);
+    if(!normalMap.isNull())
+    {
+        m_normalTexture.reset(new QOpenGLTexture(normalMap));
+        m_normalTexture->setMagnificationFilter(QOpenGLTexture::LinearMipMapLinear);
+        m_normalTexture->setMinificationFilter(QOpenGLTexture::Linear);
+    }
+    else
+    {
+        qFatal("Can not load image file.");
+        return;
+    }
 
     //setup uniforms
     registerUniforms();
@@ -94,7 +107,8 @@ void ChunkManagerTS::move(QVector3D pos)
         update(pos);
     }
 
-    m_mapTexture->bind();
+    m_mapTexture->bind(0);
+    m_normalTexture->bind(1);
     m_shader->bind();
     *viewPos = pos;
     m_shader->update_frame();
@@ -118,13 +132,13 @@ void ChunkManagerTS::move(QVector3D pos)
 
 }
 
-
 void ChunkManagerTS::registerUniforms()
 {
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("maxWidth",(float)m_mapSize.width(),maxWidth);
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("maxHeight",(float)m_mapSize.height(),maxHeight);
-    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("heightScale",float(256),heightScale);
+    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("heightScale",float(m_chunkSize),heightScale);
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("tex",int(0),tex);
+    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("norm",int(1),norm);
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("mMatrix",QMatrix4x4(),mMatrix);
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("viewPos",QVector3D(),viewPos);
 }
@@ -134,8 +148,8 @@ void ChunkManagerTS::genBaseBatch(int baseDetailLevel)
 
     m_baseBatch.reset(new QMGE_Core::QMGE_GLBatch());
 
-    int uCount = (int)qPow(2.0f,(float)baseDetailLevel);
-    float delta = 1.0f / (float)uCount;
+    float uCount = qPow(2.0f,(float)baseDetailLevel);
+    float delta = 1.0f / uCount;
     if(m_chunkSize<delta)
     {
         //reset null
@@ -160,24 +174,11 @@ void ChunkManagerTS::genBaseBatch(int baseDetailLevel)
         for(h=hstart;h<=hend;h+=delta)
         {
             points->push_back(h);
-            points->push_back(v);            
+            points->push_back(v);
         }
         colSize++;
     }
-    //prepare indices
-    //quad
-    /*
-    for(GLuint i=0;i<colSize-1;++i)
-    {
-        for(GLuint j=0;j<colSize-1;++j)
-        {
-            indices->push_back(i*colSize + j);
-            indices->push_back((i+1)*colSize + j);
-            indices->push_back((i+1)*colSize + (j+1));
-            indices->push_back(i*colSize + (j+1));
-        }
-    }
-    */
+
     GLuint verts[3];
     //triangles
     int count = 0;
@@ -214,5 +215,4 @@ void ChunkManagerTS::genBaseBatch(int baseDetailLevel)
     m_baseBatch->setVertexData((GLfloat*)points->data(),points->count()/2,QMGE_Core::VA_TUV_0);
     m_baseBatch->setIndexData(indices->data(),indices->count());
     m_baseBatch->setPrimitiveType(GL_PATCHES);
-
 }

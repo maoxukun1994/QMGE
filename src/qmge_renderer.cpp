@@ -126,17 +126,15 @@ void QMGE_Renderer::postInit()
     camcontrol.reset(new QMGE_FPSCameraController(camera));
 
     m_chunkManager.reset(new ChunkManagerTS());
-    m_chunkManager->loadMap(":/textures/hm3.png");
+    m_chunkManager->loadMap(":/textures/hm1.jpg",":/textures/hm1_norm.jpg");
+
+    lineMode = false;
 
     glEnable(GL_DEPTH_TEST);
+    glFrontFace(GL_CCW);
+    glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
-    glClearColor(0.2f,0.2f,0.4f,1.0f);
-
-#ifdef OPENGL_DESKTOP
-    auto f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_5_Core>();
-    f->glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-#endif
-
+    glClearColor(0.1f,0.2f,0.1f,1.0f);
 }
 
 
@@ -144,7 +142,6 @@ void QMGE_Renderer::postInit()
 void QMGE_Renderer::render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-
     camcontrol->updateCam(0.016f);
     m_chunkManager->move(camera->getTransform().position);
 }
@@ -264,6 +261,23 @@ void QMGE_Renderer::windowKeyChanged(int key,bool pressed)
 {
     //register key change event
     camcontrol->move(key,pressed);
+
+    //temp toggle wire frame
+#ifdef OPENGL_DESKTOP
+    if(key == Qt::Key_F && pressed)
+    {
+        auto f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_5_Core>();
+        if(lineMode)
+        {
+            f->glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+        }
+        else
+        {
+            f->glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+        }
+        lineMode = !lineMode;
+    }
+#endif
 }
 
 void QMGE_Renderer::windowMouseMoved(int deltax,int deltay)

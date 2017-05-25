@@ -79,6 +79,8 @@ private:
 
     //QScopedPointer<ChunkManager> m_chunkManager;
     QScopedPointer<ChunkManagerTS> m_chunkManager;
+
+    bool lineMode;
 };
 //class QMGE_Renderer
 

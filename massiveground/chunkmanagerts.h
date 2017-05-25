@@ -49,7 +49,7 @@ public:
 
     ChunkManagerTS();
 
-    void loadMap(QString heightMapFileName);
+    void loadMap(QString heightMapFileName, QString normalMapFilename);
 
     void update(QVector3D currentPos);
 
@@ -72,6 +72,7 @@ private:
     QSizeF m_mapSize;
 
     QSharedPointer<QOpenGLTexture> m_mapTexture;
+    QSharedPointer<QOpenGLTexture> m_normalTexture;
 
     QSharedPointer<QMGE_Core::QMGE_GLShaderProgram> m_shader;
 
@@ -88,6 +89,7 @@ private:
     float * maxHeight;
     float * heightScale;
     int * tex;
+    int * norm;
 };
 
 #endif // CHUNKMANAGERTS_H

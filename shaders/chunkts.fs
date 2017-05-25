@@ -6,18 +6,25 @@ in float distanceToLight;
 //outs
 out vec4 color;
 
-
 uniform sampler2D tex;
+uniform sampler2D norm;
 
 void main()
 {
+    vec3 normal = texture(norm,tuv.xy).xyz;
+    vec3 lightDir = vec3(1,1,1);
+    lightDir = normalize(lightDir);
+    normal = normalize(normal);
+    float diffuse = max(dot(normal,lightDir),0.0f);
+
     if(gl_FragCoord.x > 640)
     {
-        color = vec4(texture(tex,tuv.xy)) * min((80.0f/distanceToLight),1.0f);
+        color = vec4(texture(norm,tuv.xy)) * min(max(80.0f/distanceToLight,0.3f),1.3f) * diffuse;
     }
     else
     {
-        color = vec4(tuv.z,1.0f-tuv.z,0.1f,1.0f) * min((30.0f/distanceToLight),2.0f);
+        color = vec4(texture(tex,tuv.xy)) * min(max(80.0f/distanceToLight,0.3f),1.3f) * diffuse;
+        //color = vec4(tuv.z,1.0f-tuv.z,0.1f,1.0f) * min(max(80.0f/distanceToLight,0.3f),1.1f) * diffuse;
     }
 } 
  

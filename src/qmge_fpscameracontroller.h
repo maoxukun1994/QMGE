@@ -21,6 +21,10 @@ public:
     //in degrees
     void setMaxAngleSpeed(float speed);
 
+    void stop();
+
+    QVector3D getLinearVelocity();
+
 public slots:
 
     void move(int keyCode,bool start);
@@ -34,7 +38,6 @@ private:
     QSharedPointer<QMGE_GLCamera> m_camera;
 
     QVector3D m_currentLinearSpeed;
-    QVector3D m_destRot;
     float m_currentAngleSpeed;
     float m_maxLinearspeed;
     float m_maxAngleSpeed;

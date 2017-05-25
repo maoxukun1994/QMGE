@@ -23,8 +23,8 @@ void main()
     }
     else
     {
-        color = vec4(texture(tex,tuv.xy)) * min(max(80.0f/distanceToLight,0.3f),1.3f) * diffuse;
-        //color = vec4(tuv.z,1.0f-tuv.z,0.1f,1.0f) * min(max(80.0f/distanceToLight,0.3f),1.1f) * diffuse;
+        //color = vec4(texture(tex,tuv.xy)) * min(max(80.0f/distanceToLight,0.3f),1.3f) * diffuse;
+        color = vec4(tuv.z,1.0f-tuv.z,0.1f,1.0f) * min(max(80.0f/distanceToLight,0.3f),1.3f) * diffuse;
     }
 } 
  

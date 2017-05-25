@@ -126,7 +126,7 @@ void QMGE_Renderer::postInit()
     camcontrol.reset(new QMGE_FPSCameraController(camera));
 
     m_chunkManager.reset(new ChunkManagerTS());
-    m_chunkManager->loadMap(":/textures/hm3.png",":/textures/hm3_norm.jpg");
+    m_chunkManager->loadMap(":/textures/hm1.jpg",":/textures/hm1_norm.jpg");
 
     lineMode = false;
 

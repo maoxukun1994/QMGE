@@ -125,10 +125,14 @@ void QMGE_Renderer::postInit()
     QMGE_GLUniformManager::getInstance()->registerUniform("pMatrix",QMatrix4x4(),camera->m_pMatrix);
     camcontrol.reset(new QMGE_FPSCameraController(camera));
 
+    QMGE_GLUniformManager::getInstance()->registerUniform("split",int(640),split);
+
     m_chunkManager.reset(new ChunkManagerTS());
     m_chunkManager->loadMap(":/textures/hm1.jpg",":/textures/hm1_norm.jpg");
 
     lineMode = false;
+    is1Pressed = false;
+    is2Pressed = false;
 
     glEnable(GL_DEPTH_TEST);
     glFrontFace(GL_CCW);
@@ -142,6 +146,9 @@ void QMGE_Renderer::postInit()
 void QMGE_Renderer::render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+    if(is1Pressed) (*split) += 5;
+    if(is2Pressed) (*split) -= 5;
     camcontrol->updateCam(0.016f);
     m_chunkManager->move(camera->getTransform().position);
 }
@@ -261,6 +268,19 @@ void QMGE_Renderer::windowKeyChanged(int key,bool pressed)
 {
     //register key change event
     camcontrol->move(key,pressed);
+
+
+    //split uniform
+    if(key == Qt::Key_1)
+    {
+        if(pressed) is1Pressed = true;
+        else is1Pressed = false;
+    }
+    if(key == Qt::Key_2)
+    {
+        if(pressed) is2Pressed = true;
+        else is2Pressed = false;
+    }
 
     //temp toggle wire frame
 #ifdef OPENGL_DESKTOP

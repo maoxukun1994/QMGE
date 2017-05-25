@@ -8,6 +8,7 @@ out vec4 color;
 
 uniform sampler2D tex;
 uniform sampler2D norm;
+uniform int split;
 
 void main()
 {
@@ -17,7 +18,7 @@ void main()
     normal = normalize(normal);
     float diffuse = max(dot(normal,lightDir),0.0f);
 
-    if(gl_FragCoord.x > 640)
+    if(gl_FragCoord.x > split)
     {
         color = vec4(texture(norm,tuv.xy)) * min(max(80.0f/distanceToLight,0.3f),1.3f) * diffuse;
     }

@@ -81,6 +81,11 @@ private:
     QScopedPointer<ChunkManagerTS> m_chunkManager;
 
     bool lineMode;
+
+    //for chunkmanagerts uniform
+    int * split;
+    bool is1Pressed;
+    bool is2Pressed;
 };
 //class QMGE_Renderer
 

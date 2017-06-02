@@ -139,7 +139,7 @@ void ChunkManagerTS::move(QVector3D pos)
         }
         else
         {
-            genBaseBatch(-1);
+            genBaseBatch(0);
         }
     }
 

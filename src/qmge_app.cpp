@@ -17,7 +17,7 @@ QSharedPointer<QMGE_GLWindow> QMGE_App::createWindow(QSize size, bool isFullScre
     QSurfaceFormat config;
     config.setDepthBufferSize(24);
     config.setStencilBufferSize(8);
-    config.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+    config.setSwapBehavior(QSurfaceFormat::TripleBuffer);
     config.setSwapInterval(1);
     config.setSamples(0);
     if(QOpenGLContext::openGLModuleType() == QOpenGLContext::LibGL)

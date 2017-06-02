@@ -15,10 +15,10 @@ QMGE_FPSCameraController::QMGE_FPSCameraController(QSharedPointer<QMGE_GLCamera>
         m_camera = camera;
     }
     m_currentAngleSpeed = 0.0f;
-    m_maxLinearspeed = 30.0f;
+    m_maxLinearspeed = 10.0f;
     m_maxAngleSpeed = 90.0f;
     m_angleAcc = 90.0f;
-    m_linearAcc = 20.0f;
+    m_linearAcc = 3.0f;
 
     m_isForward = false;
     m_isBack = false;
@@ -26,10 +26,14 @@ QMGE_FPSCameraController::QMGE_FPSCameraController(QSharedPointer<QMGE_GLCamera>
     m_isRight = false;
     m_isUp = false;
     m_isDown = false;
+
+    m_turbo = false;
 }
 
 void QMGE_FPSCameraController::updateCam(float deltaTime)
 {
+    if(m_turbo) deltaTime *= 3;
+
     bool moved = false;
     //position
     if(m_isForward)
@@ -127,6 +131,8 @@ void QMGE_FPSCameraController::move(int keyCode,bool start)
     case Qt::Key_D:
         m_isRight = start;
         break;
+    case Qt::Key::Key_Shift:
+        m_turbo = start;
     default:
         break;
     }

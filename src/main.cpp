@@ -6,7 +6,7 @@ int main(int argc,char ** argv)
 
     QScopedPointer<QMGE_Core::QMGE_App> app(new QMGE_Core::QMGE_App());
     app->createWindow(QSize(1280,729),false);
-    //app->createWindow(0,0,true);
+    //app->createWindow(QSize(1280,729),true);
     app->run();
 
     return a.exec();

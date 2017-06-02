@@ -8,6 +8,11 @@ QMGE_UniformProvider::QMGE_UniformProvider()
 
 }
 
+QMGE_UniformProvider::~QMGE_UniformProvider()
+{
+
+}
+
 void QMGE_UniformProvider::registerUniforms()
 {
 

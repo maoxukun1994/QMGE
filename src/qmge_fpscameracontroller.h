@@ -50,6 +50,8 @@ private:
     bool m_isRight;
     bool m_isUp;
     bool m_isDown;
+
+    bool m_turbo;
 };
 //class QMGE_FPSCameraController
 

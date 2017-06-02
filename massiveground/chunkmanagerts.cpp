@@ -72,7 +72,12 @@ void ChunkManagerTS::update(QVector3D currentPos)
     while (it != m_chunks.end())
     {
         QPoint actualSector = it->sector;
-        if(actualSector.x()<startSector.x() || actualSector.x()>endSector.x() || actualSector.y()<startSector.y() || actualSector.y()>endSector.y())
+        //for "circle" chunk load
+        int i2 = qAbs(viewSector.y()-it.value().sector.y());
+        int j2 = qAbs(viewSector.x()-it.value().sector.x());
+        i2 *= i2;
+        j2 *= j2;
+        if(actualSector.x()<startSector.x() || actualSector.x()>endSector.x() || actualSector.y()<startSector.y() || actualSector.y()>endSector.y() || qSqrt(i2+j2)>(float)m_chunkViewDistance)
         {
             //remove
             it = m_chunks.erase(it);
@@ -88,6 +93,14 @@ void ChunkManagerTS::update(QVector3D currentPos)
         for(int j = startSector.x();j <= endSector.x();++j)
         {
             if(i<0 || i>maxSector.y() || j<0 || j>maxSector.x()) continue;
+
+            //for "circle" chunk load
+            int i2 = qAbs(viewSector.y()-i);
+            int j2 = qAbs(viewSector.x()-j);
+            i2 *= i2;
+            j2 *= j2;
+            if(qSqrt(i2+j2) > (float)m_chunkViewDistance) continue;
+
             QString key = ChunkTS::genKey(j,i);
             //already have
             if(m_chunks.find(key) != m_chunks.end()) continue;
@@ -126,7 +139,7 @@ void ChunkManagerTS::move(QVector3D pos)
         }
         else
         {
-            genBaseBatch(0);
+            genBaseBatch(-1);
         }
     }
 

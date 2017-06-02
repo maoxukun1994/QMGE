@@ -14,6 +14,8 @@ public:
 
     QMGE_UniformProvider();
 
+    virtual ~QMGE_UniformProvider();
+
 protected:
 
     virtual void registerUniforms();

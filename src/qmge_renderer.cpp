@@ -147,8 +147,16 @@ void QMGE_Renderer::render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    if(is1Pressed) (*split) += 5;
-    if(is2Pressed) (*split) -= 5;
+    if(is1Pressed)
+    {
+        (*split) += 10;
+        if(*split > m_renderWindow->width()) *split = m_renderWindow->width();
+    }
+    if(is2Pressed)
+    {
+        (*split) -= 10;
+        if(*split < 0) *split = 0;
+    }
     camcontrol->updateCam(0.016f);
     m_chunkManager->move(camera->getTransform().position);
 }

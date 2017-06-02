@@ -3,7 +3,7 @@
 # Please Use QT 5.8 or greater for this project
 #-------------------------------------------------
 
-CONFIG += c++11 qt
+CONFIG += c++11 qt resources_big
 QT += core gui widgets
 TARGET = QMGE
 TEMPLATE = app
@@ -28,7 +28,6 @@ SOURCES += \
     src/qmge_uniformprovider.cpp \
     massiveground/chunkmanager.cpp \
     massiveground/chunk.cpp \
-    massiveground/massivegroundwindow.cpp \
     massiveground/chunkupdater.cpp \
     massiveground/chunkmanagerts.cpp
 
@@ -46,7 +45,6 @@ HEADERS += \
     src/qmge_uniformprovider.h \
     massiveground/chunkmanager.h \
     massiveground/chunk.h \
-    massiveground/massivegroundwindow.h \
     massiveground/chunkupdater.h \
     massiveground/chunkmanagerts.h
 
@@ -58,5 +56,4 @@ DISTFILES += \
 RESOURCES += \
     resource.qrc
 
-FORMS += \
-    massiveground/massivegroundwindow.ui
+FORMS +=

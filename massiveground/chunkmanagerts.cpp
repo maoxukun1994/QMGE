@@ -4,9 +4,9 @@ ChunkManagerTS::ChunkManagerTS()
 {
     m_chunkSize = 32.0f;
 
-    m_imgMapScaleFactor = 0.2;
+    m_imgMapScaleFactor = 0.3;
 
-    m_chunkViewDistance = 8;
+    m_chunkViewDistance = 10;
 }
 
 
@@ -45,12 +45,12 @@ void ChunkManagerTS::loadMap(QString heightMapFileName, QString normalMapFilenam
 
     //init shader
     m_shader.reset(new QMGE_Core::QMGE_GLShaderProgram());
-    m_shader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/shaders/chunkts.vs");
-    m_shader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/shaders/chunkts.fs");
+    m_shader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/massiveground/shaders/chunkts/chunkts.vs");
+    m_shader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/massiveground/shaders/chunkts/chunkts.fs");
     //m_shader->addShaderFromSourceFile(QOpenGLShader::Geometry,":/shaders/chunkts.gs");
-    m_shader->addShaderFromSourceFile(QOpenGLShader::TessellationControl,":/shaders/chunkts.tcs");
-    m_shader->addShaderFromSourceFile(QOpenGLShader::TessellationEvaluation,":/shaders/chunkts.tes");
-    m_shader->setShaderConfigFile(":/shaders/chunkts.config");
+    m_shader->addShaderFromSourceFile(QOpenGLShader::TessellationControl,":/massiveground/shaders/chunkts/chunkts.tcs");
+    m_shader->addShaderFromSourceFile(QOpenGLShader::TessellationEvaluation,":/massiveground/shaders/chunkts/chunkts.tes");
+    m_shader->setShaderConfigFile(":/massiveground/shaders/chunkts/chunkts.config");
     m_shader->linkProgram();
 }
 
@@ -125,6 +125,11 @@ void ChunkManagerTS::move(QVector3D pos)
     m_shader->bind();
     *viewPos = pos;
     m_shader->update_frame();
+
+    if(m_baseBatch.isNull())
+    {
+        genBaseBatch(-1);
+    }
     for(auto p : m_chunks)
     {
         //set chunk dependent uniforms
@@ -133,14 +138,8 @@ void ChunkManagerTS::move(QVector3D pos)
 
         *mMatrix = p.trans;
         m_shader->update_once();
-        if(!m_baseBatch.isNull())
-        {
-            m_baseBatch->draw();
-        }
-        else
-        {
-            genBaseBatch(0);
-        }
+
+        m_baseBatch->draw();
     }
 
 }
@@ -149,7 +148,7 @@ void ChunkManagerTS::registerUniforms()
 {
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("maxWidth",(float)m_mapSize.width(),maxWidth);
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("maxHeight",(float)m_mapSize.height(),maxHeight);
-    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("heightScale",float(m_chunkSize),heightScale);
+    QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("heightScale",float(m_chunkSize*2),heightScale);
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("tex",int(0),tex);
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("norm",int(1),norm);
     QMGE_Core::QMGE_GLUniformManager::getInstance()->registerUniform("mMatrix",QMatrix4x4(),mMatrix);

@@ -64,22 +64,15 @@ protected:
 private:
 
     QSharedPointer<QMGE_Core::QMGE_GLBatch> m_baseBatch;
-
     QHash<QString,ChunkTS> m_chunks;
-
     QVector3D m_viewPos;
-
     QSizeF m_mapSize;
-
     QSharedPointer<QOpenGLTexture> m_mapTexture;
     QSharedPointer<QOpenGLTexture> m_normalTexture;
-
     QSharedPointer<QMGE_Core::QMGE_GLShaderProgram> m_shader;
 
     float m_chunkSize;
-
     float m_imgMapScaleFactor;
-
     int m_chunkViewDistance;
 
     //uniforms

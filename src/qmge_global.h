@@ -40,8 +40,15 @@
 
 #endif // QMGE_GLOBAL_H
 
-#define OPENGL_DESKTOP
+//#define OPENGL_DESKTOP_4_5
+#define OPENGL_DESKTOP_4_4
 
-#ifdef OPENGL_DESKTOP
+
+#ifdef OPENGL_DESKTOP_4_5
 #include <QOpenGLFunctions_4_5_Core>
+#endif
+
+
+#ifdef OPENGL_DESKTOP_4_4
+#include <QOpenGLFunctions_4_4_Core>
 #endif

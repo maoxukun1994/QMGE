@@ -7,20 +7,25 @@
         <file>shaders/geo.fs</file>
         <file>shaders/geo.gs</file>
         <file>shaders/geo.vs</file>
-        <file>shaders/chunk.config</file>
-        <file>shaders/chunk.fs</file>
-        <file>shaders/chunk.vs</file>
-        <file>shaders/chunk.gs</file>
-        <file>shaders/chunkts.fs</file>
-        <file>shaders/chunkts.vs</file>
-        <file>shaders/chunkts.tes</file>
-        <file>shaders/chunkts.tcs</file>
-        <file>shaders/chunkts.gs</file>
-        <file>shaders/chunkts.config</file>
-        <file>textures/hm1.jpg</file>
-        <file>textures/hm2.jpg</file>
-        <file>textures/hm3.png</file>
-        <file>textures/hm3_norm.jpg</file>
-        <file>textures/hm1_norm.jpg</file>
+        <file>massiveground/shaders/chunk/chunk.config</file>
+        <file>massiveground/shaders/chunk/chunk.fs</file>
+        <file>massiveground/shaders/chunk/chunk.gs</file>
+        <file>massiveground/shaders/chunk/chunk.vs</file>
+        <file>massiveground/shaders/chunkts/chunkts.config</file>
+        <file>massiveground/shaders/chunkts/chunkts.fs</file>
+        <file>massiveground/shaders/chunkts/chunkts.gs</file>
+        <file>massiveground/shaders/chunkts/chunkts.tcs</file>
+        <file>massiveground/shaders/chunkts/chunkts.tes</file>
+        <file>massiveground/shaders/chunkts/chunkts.vs</file>
+        <file>massiveground/textures/hm1.jpg</file>
+        <file>massiveground/textures/hm1_norm.jpg</file>
+        <file>massiveground/textures/hm2.jpg</file>
+        <file>massiveground/textures/hm3.png</file>
+        <file>massiveground/textures/hm3_norm.jpg</file>
+        <file>massiveground/shaders/chunkpn/chunkpn.config</file>
+        <file>massiveground/shaders/chunkpn/chunkpn.fs</file>
+        <file>massiveground/shaders/chunkpn/chunkpn.tcs</file>
+        <file>massiveground/shaders/chunkpn/chunkpn.tes</file>
+        <file>massiveground/shaders/chunkpn/chunkpn.vs</file>
     </qresource>
 </RCC>

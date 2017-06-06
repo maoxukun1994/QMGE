@@ -29,95 +29,8 @@ QMGE_Renderer::~QMGE_Renderer()
 
 void QMGE_Renderer::postInit()
 {
-    /**
-    //initialize resources
-    GLfloat verts[] =
-    {
-        -0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f,  0.5f, -0.5f,
-        0.5f,  0.5f, -0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-
-        -0.5f, -0.5f,  0.5f,
-        0.5f, -0.5f,  0.5f,
-        0.5f,  0.5f,  0.5f,
-        0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
-
-        -0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f, -0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-
-        0.5f,  0.5f,  0.5f,
-        0.5f,  0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f,  0.5f,
-        0.5f,  0.5f,  0.5f,
-
-        -0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f,  0.5f,
-        0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f,  0.5f,
-        -0.5f, -0.5f, -0.5f,
-
-        -0.5f,  0.5f, -0.5f,
-        0.5f,  0.5f, -0.5f,
-        0.5f,  0.5f,  0.5f,
-        0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f,  0.5f,
-        -0.5f,  0.5f, -0.5f,
-    };
-    GLfloat tuvs[] =
-    {
-        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,0.0f, 1.0f,0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,0.0f, 1.0f,0.0f, 0.0f,
-        1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,0.0f, 0.0f,1.0f, 0.0f,
-        1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,0.0f, 0.0f,1.0f, 0.0f,
-        0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,0.0f, 0.0f,0.0f, 1.0f,
-        0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,0.0f, 0.0f,0.0f, 1.0f
-    };
-    **/
-
-    /*
-    GLfloat verts[] =
-    {
-        0.0f,0.0f,0.0f,
-        1.0f,0.0f,0.0f,
-        0.0f,1.0f,0.0f,
-        1.0f,1.0f,0.0f
-    };
-
-    GLfloat tuvs[] =
-    {
-        0.0f,0.0f,
-        1.0f,0.0f,
-        0.0f,1.0f,
-        1.0f,1.0f
-    };
-
-    GLuint indices[] =
-    {
-        0,1,2,2,1,3
-    };
-
-    testBatch.reset(new QMGE_GLBatch());
-    testBatch->enableBatchVertexAttrib(VA_POSITION);
-    testBatch->enableBatchVertexAttrib(VA_TUV_0);
-    testBatch->setVertexData(verts,4,VA_POSITION);
-    testBatch->setVertexData(tuvs,4,VA_TUV_0);
-    testBatch->setIndexData(indices,6);
-    */
-
     camera.reset(new QMGE_GLCamera());
-    camera->setPosition(320,320,64);
+    camera->setPosition(0,0,64);
     camera->setPitch(-45.0f);
     camera->setYaw(45.0f);
     camera->setPerspective(75.0f,1.788f,0.1f,1000.0f);
@@ -126,9 +39,14 @@ void QMGE_Renderer::postInit()
     camcontrol.reset(new QMGE_FPSCameraController(camera));
 
     QMGE_GLUniformManager::getInstance()->registerUniform("split",int(640),split);
-
     m_chunkManager.reset(new ChunkManagerTS());
-    m_chunkManager->loadMap(":/textures/hm1.jpg",":/textures/hm1_norm.jpg");
+    m_chunkManager->loadMap(":/massiveground/textures/hm1.jpg",":/massiveground/textures/hm1_norm.jpg");
+
+    //m_chunkManager.reset(new ChunkManagerPN());
+    //m_chunkManager->load();
+
+    //m_chunkManager.reset(new ChunkManager());
+    //m_chunkManager->loadMap(":/massiveground/textures/hm1.jpg");
 
     lineMode = false;
     is1Pressed = false;
@@ -291,10 +209,10 @@ void QMGE_Renderer::windowKeyChanged(int key,bool pressed)
     }
 
     //temp toggle wire frame
-#ifdef OPENGL_DESKTOP
+#ifdef OPENGL_DESKTOP_4_4
     if(key == Qt::Key_F && pressed)
     {
-        auto f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_5_Core>();
+        auto f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_4_Core>();
         if(lineMode)
         {
             f->glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);

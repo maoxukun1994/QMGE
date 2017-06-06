@@ -40,10 +40,10 @@ void ChunkManager::loadMap(QString heightMapFileName)
 
     //init shader
     m_shader.reset(new QMGE_Core::QMGE_GLShaderProgram());
-    m_shader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/shaders/chunk.vs");
-    m_shader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/shaders/chunk.fs");
-    m_shader->addShaderFromSourceFile(QOpenGLShader::Geometry,":/shaders/chunk.gs");
-    m_shader->setShaderConfigFile(":/shaders/chunk.config");
+    m_shader->addShaderFromSourceFile(QOpenGLShader::Vertex,":/massiveground/shaders/chunk/chunk.vs");
+    m_shader->addShaderFromSourceFile(QOpenGLShader::Fragment,":/massiveground/shaders/chunk/chunk.fs");
+    m_shader->addShaderFromSourceFile(QOpenGLShader::Geometry,":/massiveground/shaders/chunk/chunk.gs");
+    m_shader->setShaderConfigFile(":/massiveground/shaders/chunk/chunk.config");
     m_shader->linkProgram();
 
     m_chunkUpdater->moveToThread(&m_updateThread);

@@ -29,7 +29,8 @@ SOURCES += \
     massiveground/chunkmanager.cpp \
     massiveground/chunk.cpp \
     massiveground/chunkupdater.cpp \
-    massiveground/chunkmanagerts.cpp
+    massiveground/chunkmanagerts.cpp \
+    massiveground/chunkmanagerpn.cpp
 
 HEADERS += \
     src/qmge_global.h \
@@ -46,7 +47,8 @@ HEADERS += \
     massiveground/chunkmanager.h \
     massiveground/chunk.h \
     massiveground/chunkupdater.h \
-    massiveground/chunkmanagerts.h
+    massiveground/chunkmanagerts.h \
+    massiveground/chunkmanagerpn.h
 
 DISTFILES += \
     README.md \

@@ -24,7 +24,7 @@ QSharedPointer<QMGE_GLWindow> QMGE_App::createWindow(QSize size, bool isFullScre
     {
         config.setRenderableType(QSurfaceFormat::OpenGL);
         config.setProfile(QSurfaceFormat::CoreProfile);
-        config.setVersion(4,5);
+        config.setVersion(4,4);
     }
     else
     {

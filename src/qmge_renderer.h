@@ -10,6 +10,7 @@
 #include "qmge_glcamera.h"
 #include "massiveground/chunkmanager.h"
 #include "massiveground/chunkmanagerts.h"
+#include "massiveground/chunkmanagerpn.h"
 
 namespace QMGE_Core
 {
@@ -79,6 +80,7 @@ private:
 
     //QScopedPointer<ChunkManager> m_chunkManager;
     QScopedPointer<ChunkManagerTS> m_chunkManager;
+    //QScopedPointer<ChunkManagerPN> m_chunkManager;
 
     bool lineMode;
 

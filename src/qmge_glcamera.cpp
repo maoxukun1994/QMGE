@@ -4,7 +4,7 @@ namespace QMGE_Core
 {
 
 QMGE_GLCamera::QMGE_GLCamera(QMGE_CameraPerspective type, QMGE_SceneObject * parent) :
-QMGE_SceneObject(parent),baseForward(0.0f,1.0f,0.0f),baseUp(0.0f,0.0f,1.0f),baseLeft(-1.0f,0.0f,0.0f)
+    QMGE_SceneObject(parent),baseForward(0.0f,1.0f,0.0f),baseUp(0.0f,0.0f,1.0f),baseLeft(-1.0f,0.0f,0.0f)
 {
     m_type = type;
 

@@ -1,0 +1,75 @@
+#version 440 core
+layout(vertices = 3) out;
+
+uniform vec3 viewPos;
+uniform mat4 mMatrix;
+uniform float maxWidth;
+uniform float maxHeight;
+uniform float heightScale;
+uniform sampler2D tex;
+
+float level(vec4 poz1, vec4 poz2)
+{
+    float lod=1;
+    float d=distance(poz1, poz2);
+    if(d<1) lod = 64;
+    if(1<=d && d<5) lod = 16;
+    if(5<=d && d<10) lod=12;
+    if(10<=d && d<20) lod=8;
+    if(20<=d && d<40) lod=4;
+    if(40<=d && d<75) lod=2;
+    return lod;
+}
+
+
+void main()
+{
+    if(gl_InvocationID == 0)
+    {
+        //需要优化
+        //sample height
+        vec2 actualPos0 = (mMatrix * gl_in[0].gl_Position).xy;
+        vec2 actualPos1 = (mMatrix * gl_in[1].gl_Position).xy;
+        vec2 actualPos2 = (mMatrix * gl_in[2].gl_Position).xy;
+        vec2 vv0 = vec2(actualPos0.x/maxWidth,actualPos0.y/maxHeight);
+        vec2 vv1 = vec2(actualPos1.x/maxWidth,actualPos1.y/maxHeight);
+        vec2 vv2 = vec2(actualPos2.x/maxWidth,actualPos2.y/maxHeight);
+        vec4 samplecolor0 = texture(tex,vv0);
+        vec4 samplecolor1 = texture(tex,vv1);
+        vec4 samplecolor2 = texture(tex,vv2);
+    
+        vec4 pos0 = (mMatrix * gl_in[0].gl_Position);
+        vec4 pos1 = (mMatrix * gl_in[1].gl_Position);
+        vec4 pos2 = (mMatrix * gl_in[2].gl_Position);
+        
+        pos0.z = (samplecolor0.r*0.299 + samplecolor0.g*0.587 + samplecolor0.b*0.114)*heightScale;
+        pos1.z = (samplecolor1.r*0.299 + samplecolor1.g*0.587 + samplecolor1.b*0.114)*heightScale;
+        pos2.z = (samplecolor2.r*0.299 + samplecolor2.g*0.587 + samplecolor2.b*0.114)*heightScale;
+        //需要优化
+        
+        vec3 d1=pos1.xyz+(pos2.xyz-pos1.xyz)/2;
+        vec3 d2=pos0.xyz+(pos2.xyz-pos0.xyz)/2;
+        vec3 d3=pos0.xyz+(pos1.xyz-pos0.xyz)/2;
+
+        float e0=level(vec4(d1,1.0),vec4(viewPos,1.0));
+        float e1=level(vec4(d2,1.0),vec4(viewPos,1.0));
+        float e2=level(vec4(d3,1.0),vec4(viewPos,1.0));
+        //float m=min(e0,min(e1,e2));
+
+        gl_TessLevelInner[0] = floor((min(e0,min(e1,e2))+max(e0,max(e1,e2)))/2);
+        gl_TessLevelOuter[0] = e0;
+        gl_TessLevelOuter[1] = e1;
+        gl_TessLevelOuter[2] = e2;
+        
+        /*
+        gl_TessLevelInner[0] = 2.0f;
+        gl_TessLevelOuter[0] = 2.0f;
+        gl_TessLevelOuter[1] = 2.0f;
+        gl_TessLevelOuter[2] = 2.0f;
+        */
+        
+    }
+    
+    gl_out[gl_InvocationID].gl_Position = mMatrix * gl_in[gl_InvocationID].gl_Position;
+}
+

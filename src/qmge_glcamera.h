@@ -36,6 +36,7 @@ public:
 
     QVector3D getForward();
     QVector3D getUp();
+    QVector3D getLeft();
 
     //set
     void setPitch(float degree);
@@ -71,6 +72,7 @@ protected:
 
     QVector3D m_forward;
     QVector3D m_up;
+    QVector3D m_left;
 
     //control
     float m_pitchDegree;
@@ -83,10 +85,10 @@ protected:
     float m_fov;
     float m_aspect;
     //ortho
-    float m_left;
-    float m_right;
-    float m_bottom;
-    float m_top;
+    float m_oleft;
+    float m_oright;
+    float m_obottom;
+    float m_otop;
 };
 //class QMGE_GLCamera
 

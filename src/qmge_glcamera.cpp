@@ -3,17 +3,18 @@
 namespace QMGE_Core
 {
 
-QMGE_GLCamera::QMGE_GLCamera(QMGE_CameraPerspective type, QMGE_SceneObject * parent) :
-    QMGE_SceneObject(parent),baseForward(0.0f,1.0f,0.0f),baseUp(0.0f,0.0f,1.0f),baseLeft(-1.0f,0.0f,0.0f)
+QMGE_GLCamera::QMGE_GLCamera(QMGE_CameraPerspective type, QMGE_SceneObject * parent):
+QMGE_SceneObject(parent),baseForward(1.0f,0.0f,0.0f),baseUp(0.0f,0.0f,1.0f),baseLeft(0.0f,1.0f,0.0f)
 {
     m_type = type;
 
     m_pitchDegree = 0.0f;
-    m_yawDegree = 90.0f;
+    m_yawDegree = 0.0f;
     m_rollDegree = 0.0f;
 
     m_forward = baseForward;
     m_up = baseUp;
+    m_left = baseLeft;
 
     //for distance clipping
     m_near = 0.1f;
@@ -22,10 +23,10 @@ QMGE_GLCamera::QMGE_GLCamera(QMGE_CameraPerspective type, QMGE_SceneObject * par
     m_fov = 60.0f;
     m_aspect = 1.788f;
     //ortho
-    m_left = 0.0f;
-    m_right = 0.0f;
-    m_bottom = 0.0f;
-    m_top = 0.0f;
+    m_oleft = 0.0f;
+    m_oright = 0.0f;
+    m_obottom = 0.0f;
+    m_otop = 0.0f;
 
     registerUniforms();
 }
@@ -54,20 +55,18 @@ void QMGE_GLCamera::setPerspective(float fov,float aspect,float vnear,float vfar
     m_aspect = aspect;
     m_near = vnear;
     m_far = vfar;
-
     updateP();
 }
 
 void QMGE_GLCamera::setOrtho(float left, float right, float bottom, float top, float nearPlane, float farPlane)
 {
     m_type = QMGE_CameraPerspective::ORTHO;
-    m_left = left;
-    m_right = right;
-    m_bottom = bottom;
-    m_top = top;
+    m_oleft = left;
+    m_oright = right;
+    m_obottom = bottom;
+    m_otop = top;
     m_near = nearPlane;
     m_far = farPlane;
-
     updateP();
 }
 
@@ -105,6 +104,11 @@ QVector3D QMGE_GLCamera::getForward()
 QVector3D QMGE_GLCamera::getUp()
 {
     return m_up;
+}
+
+QVector3D QMGE_GLCamera::getLeft()
+{
+    return m_left;
 }
 
 void QMGE_GLCamera::setPitch(float degree)
@@ -148,11 +152,20 @@ void QMGE_GLCamera::updateV()
 {
     m_vMatrix->setToIdentity();
 
-    //including pitch and yaw, not including roll
+    //including pitch and yaw
     m_forward.setZ(qSin(qDegreesToRadians(m_pitchDegree)));
     m_forward.setX(qCos(qDegreesToRadians(m_pitchDegree)) * qCos(qDegreesToRadians(m_yawDegree)));
     m_forward.setY(qCos(qDegreesToRadians(m_pitchDegree)) * qSin(qDegreesToRadians(m_yawDegree)));
     m_forward.normalize();
+
+    //roll
+    m_up.setX(qSin(qDegreesToRadians(m_rollDegree)) * qSin(qDegreesToRadians(m_yawDegree)));
+    m_up.setY(qSin(qDegreesToRadians(m_rollDegree)) * qCos(qDegreesToRadians(m_yawDegree)));
+    m_up.setZ(qCos(qDegreesToRadians(m_rollDegree)));
+    m_up.normalize();
+
+    m_left = QVector3D::crossProduct(m_up,m_forward).normalized();
+
     m_vMatrix->lookAt(m_transform.position,m_transform.position+m_forward,m_up);
 }
 
@@ -165,7 +178,7 @@ void QMGE_GLCamera::updateP()
         m_pMatrix->perspective(m_fov,m_aspect,m_near,m_far);
         break;
     case QMGE_CameraPerspective::ORTHO:
-        m_pMatrix->ortho(m_left,m_right,m_bottom,m_top,m_near,m_far);
+        m_pMatrix->ortho(m_oleft,m_oright,m_obottom,m_otop,m_near,m_far);
         break;
     }
 }

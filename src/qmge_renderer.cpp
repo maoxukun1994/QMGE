@@ -34,8 +34,6 @@ void QMGE_Renderer::postInit()
     camera->setPitch(-45.0f);
     camera->setYaw(45.0f);
     camera->setPerspective(75.0f,1.788f,0.1f,1000.0f);
-    QMGE_GLUniformManager::getInstance()->registerUniform("vMatrix",QMatrix4x4(),camera->m_vMatrix);
-    QMGE_GLUniformManager::getInstance()->registerUniform("pMatrix",QMatrix4x4(),camera->m_pMatrix);
     camcontrol.reset(new QMGE_FPSCameraController(camera));
 
     QMGE_GLUniformManager::getInstance()->registerUniform("split",int(640),split);
@@ -193,43 +191,84 @@ void QMGE_Renderer::resizeGL(int w, int h)
 void QMGE_Renderer::windowKeyChanged(int key,bool pressed)
 {
     //register key change event
-    camcontrol->move(key,pressed);
-
-
-    //split uniform
-    if(key == Qt::Key_1)
+    switch(key)
     {
-        if(pressed) is1Pressed = true;
-        else is1Pressed = false;
-    }
-    if(key == Qt::Key_2)
-    {
-        if(pressed) is2Pressed = true;
-        else is2Pressed = false;
-    }
-
-    //temp toggle wire frame
-#ifdef OPENGL_DESKTOP_4_4
-    if(key == Qt::Key_F && pressed)
-    {
-        auto f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_4_Core>();
-        if(lineMode)
+    case Qt::Key_W:
+        camcontrol->move(FORWARD,pressed);
+        break;
+    case Qt::Key_S:
+        camcontrol->move(BACK,pressed);
+        break;
+    case Qt::Key_A:
+        camcontrol->move(LEFT,pressed);
+        break;
+    case Qt::Key_D:
+        camcontrol->move(RIGHT,pressed);
+        break;
+    case Qt::Key_Q:
+        if(pressed)
         {
-            f->glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+            camcontrol->rotateTo(camera->getYaw(),camera->getPitch(),-60.0f);
         }
         else
         {
-            f->glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+            camcontrol->rotateTo(camera->getYaw(),camera->getPitch(),0.0f);
         }
-        lineMode = !lineMode;
-    }
+        break;
+    case Qt::Key_E:
+        if(pressed)
+        {
+            camcontrol->rotateTo(camera->getYaw(),camera->getPitch(),60.0f);
+        }
+        else
+        {
+            camcontrol->rotateTo(camera->getYaw(),camera->getPitch(),0.0f);
+        }
+        break;
+    case Qt::Key_Space:
+        camcontrol->move(UP,pressed);
+        break;
+    case Qt::Key_Control:
+        camcontrol->move(DOWN,pressed);
+        break;
+    case Qt::Key_Shift:
+        camcontrol->move(BOOST,pressed);
+        break;
+    case Qt::Key_1:
+        is1Pressed = pressed;
+        break;
+    case Qt::Key_2:
+        is2Pressed = pressed;
+        break;
+#ifdef OPENGL_DESKTOP_4_4
+    case Qt::Key_F:
+        if(pressed)
+        {
+            //temp toggle wire frame
+            if(key == Qt::Key_F && pressed)
+            {
+                auto f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_4_Core>();
+                if(lineMode)
+                {
+                    f->glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
+                }
+                else
+                {
+                    f->glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
+                }
+                lineMode = !lineMode;
+            }
+        }
 #endif
+    default:
+        break;
+    }
 }
 
 void QMGE_Renderer::windowMouseMoved(int deltax,int deltay)
 {
     //register mouse move event
-    camcontrol->rotate(-(float)deltax * 0.2,-(float)deltay * 0.2,0);
+    camcontrol->rotate(-(float)deltay * 0.2,-(float)deltax * 0.2,0);
 }
 
 void QMGE_Renderer::cleanUp()

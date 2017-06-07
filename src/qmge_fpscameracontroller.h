@@ -7,6 +7,23 @@
 namespace QMGE_Core
 {
 
+enum QMGE_MoveDirection
+{
+    FORWARD = 0,
+    BACK,
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT,
+    BOOST,
+    YAW_LEFT,
+    YAW_RIGHT,
+    PITCH_UP,
+    PITCH_DOWN,
+    ROLL_LEFT,
+    ROLL_RIGHT,
+};
+
 class QMGE_FPSCameraController : public QObject
 {
     Q_OBJECT
@@ -26,23 +43,33 @@ public:
     QVector3D getLinearVelocity();
 
 public slots:
-
-    void move(int keyCode,bool start);
-
+    //move
+    void move(QMGE_MoveDirection dir,bool start);
+    //rotate overloads for fps
     void rotate(QVector3D rot);
-    //rotate overload for fps
     void rotate(float x,float y,float z);
+    void rotateTo(QVector3D dest);
+    void rotateTo(float x,float y,float z);
+
+private:
+
+    void checkDestRotate();
 
 private:
 
     QSharedPointer<QMGE_GLCamera> m_camera;
 
+    //linear speeed
     QVector3D m_currentLinearSpeed;
-    float m_currentAngleSpeed;
     float m_maxLinearspeed;
-    float m_maxAngleSpeed;
-    float m_angleAcc;
     float m_linearAcc;
+
+    //rotate speed
+    //m_destRot,x as yaw,y as pitch,z as roll
+    QVector3D m_destRot;
+    float m_maxAngleSpeed;
+    float m_rotateSpeedScale;
+
 
     bool m_isForward;
     bool m_isBack;
@@ -50,6 +77,8 @@ private:
     bool m_isRight;
     bool m_isUp;
     bool m_isDown;
+    bool m_isRollingLeft;
+    bool m_isRollingRight;
 
     bool m_turbo;
 };
